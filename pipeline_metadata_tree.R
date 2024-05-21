@@ -59,14 +59,16 @@ rsvA_ref <- rsvA_ref[order(rsvA_ref$Accession),]
 rsvB_ref <- rsvB_ref[order(rsvB_ref$Accession),]
 
 # Add nextclade clade information to metadata
+rsvA_nextclade <- arrange(rsvA_nextclade, seqName)
+rsvB_nextclade <- arrange(rsvB_nextclade, seqName)
 rsvA_clades <- rsvA_nextclade[c("clade", "G_clade")]
 rsvB_clades <- rsvB_nextclade[c("clade", "G_clade")]
 rsvA_ref <- cbind(rsvA_ref, rsvA_clades)
 rsvB_ref <- cbind(rsvB_ref, rsvB_clades)
 
 # Export metadata
-write.csv(rsvA_ref, file = "~/RSV/git/RSV Genetic Diversity/rsvA_ref_metadata.csv")
-write.csv(rsvB_ref, file = "~/RSV/git/RSV Genetic Diversity/rsvB_ref_metadata.csv")
+write.csv(rsvA_ref, file = "~/RSV/git/RSV Genetic Diversity/rsvA_ref_metadata.csv", row.names = FALSE)
+write.csv(rsvB_ref, file = "~/RSV/git/RSV Genetic Diversity/rsvB_ref_metadata.csv", row.names = FALSE)
 
 # Number of sequences per season
 tab_rsvAB_season <- as.data.frame.matrix(table(rsvAB$Collection_Season, rsvAB$Type))
@@ -134,6 +136,8 @@ treeA_plot_new <- treeA_plot %<+% df_label_A +
     legend.text = element_text(size = 30)
   )
 treeA_plot_new
+
+#ggsave(filename = "~/RSV/git/RSV Genetic Diversity/Treefiles/tree_rsvA_annotated.pdf", width = 300, height = 300, units = "cm", limitsize = FALSE)
 
 # Tree visualization: RSV B
 

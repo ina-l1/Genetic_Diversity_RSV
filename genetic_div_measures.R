@@ -102,7 +102,7 @@ plot_mds_snp_rsvB <- plot(x_mds_snp_rsvB, y_mds_snp_rsvB)
 df_mds_rsvA <- data.frame(x_axis = x_mds_rsvA, y_axis = y_mds_rsvA)
 df_mds_rsvA$ID <- rownames(df_mds_rsvA)
 df_mds_rsvA <- relocate(df_mds_rsvA, ID)
-rownames(df_mds_rsvA) <- c(1:170)
+rownames(df_mds_rsvA) <- c(1:nrow(df_mds_rsvA))
 df_mds_rsvA <- arrange(df_mds_rsvA, ID)
 
 mds_meta_rsvA <- cbind(meta_rsvA_short, df_mds_rsvA)
@@ -110,7 +110,7 @@ mds_meta_rsvA <- cbind(meta_rsvA_short, df_mds_rsvA)
 df_mds_rsvB <- data.frame(x_axis = x_mds_rsvB, y_axis = y_mds_rsvB)
 df_mds_rsvB$ID <- rownames(df_mds_rsvB)
 df_mds_rsvB <- relocate(df_mds_rsvB, ID)
-rownames(df_mds_rsvB) <- c(1:136)
+rownames(df_mds_rsvB) <- c(1:nrow(df_mds_rsvB))
 df_mds_rsvB <- arrange(df_mds_rsvB, ID)
 
 mds_meta_rsvB <- cbind(meta_rsvB_short, df_mds_rsvB)
@@ -119,13 +119,13 @@ mds_meta_rsvB <- cbind(meta_rsvB_short, df_mds_rsvB)
 df_mds_snp_rsvA <- data.frame(x_axis = x_mds_snp_rsvA, y_axis = y_mds_snp_rsvA)
 df_mds_snp_rsvA$ID <- rownames(df_mds_snp_rsvA)
 df_mds_snp_rsvA <- relocate(df_mds_snp_rsvA, ID)
-rownames(df_mds_snp_rsvA) <- c(1:170)
+rownames(df_mds_snp_rsvA) <- c(1:nrow(df_mds_snp_rsvA))
 df_mds_snp_rsvA <- arrange(df_mds_snp_rsvA, ID)
 
 df_mds_snp_rsvB <- data.frame(x_axis = x_mds_snp_rsvB, y_axis = y_mds_snp_rsvB)
 df_mds_snp_rsvB$ID <- rownames(df_mds_snp_rsvB)
 df_mds_snp_rsvB <- relocate(df_mds_rsvB, ID)
-rownames(df_mds_snp_rsvB) <- c(1:136)
+rownames(df_mds_snp_rsvB) <- c(1:nrow(df_mds_snp_rsvB))
 df_mds_snp_rsvB <- arrange(df_mds_snp_rsvB, ID)
 
 mds_snp_meta_rsvA <- cbind(meta_rsvA_short, df_mds_snp_rsvA)
@@ -274,7 +274,7 @@ plot_violin_pair_between_rsvB <- ggplot(distgroup_between_pair_rsvB, aes(x = Bet
 plot_violin_pair_between_rsvB
 
 # SNP distance
-snp_dist_rsvA <- snp_dist_rsvA[order(rownames(snp_dist_rsvA)),] #sort alphebetically
+snp_dist_rsvA <- snp_dist_rsvA[order(rownames(snp_dist_rsvA)),] #sort alphabetically
 distgroup_snp_rsvA <- dist_groups(snp_dist_rsvA, meta_rsvA_short$Collection_Season)
 
 distgroup_within_snp_rsvA <- subset(distgroup_snp_rsvA, Group1 == Group2)
