@@ -16,12 +16,13 @@ numberofisolates = as.data.frame.matrix(table(NCBI_wgs_df$Collection_Season))
 colnames(numberofisolates) = c("Season", "number_of_isolates")'
 
 # European sequences
+# Imported files are already fixed
 
 rsvA_meta_EU <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/NCBI_rsvA_wgs_europe_2015.csv")
 rsvB_meta_EU <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/NCBI_rsvB_wgs_europe_2015.csv")
 
-rsvA_meta_EU$Collection_Date <- as.Date(rsvA_meta_EU$Collection_Date, format = "%m/%d/%Y")
-rsvB_meta_EU$Collection_Date <- as.Date(rsvB_meta_EU$Collection_Date, format = "%m/%d/%Y")
+'rsvA_meta_EU$Collection_Date <- as.Date(rsvA_meta_EU$Collection_Date, format = "%Y-%m-%d")
+rsvB_meta_EU$Collection_Date <- as.Date(rsvB_meta_EU$Collection_Date, format = "%Y-%m-%d")
 
 rsvA_meta_EU <- subset(rsvA_meta_EU, is.na(Collection_Date) == FALSE)
 rsvB_meta_EU <- subset(rsvB_meta_EU, is.na(Collection_Date) == FALSE)
@@ -29,7 +30,7 @@ rsvB_meta_EU <- subset(rsvB_meta_EU, is.na(Collection_Date) == FALSE)
 # --> Number of sequences: RSV-A 731, RSV-B 699
 
 write.csv(rsvA_meta_EU, file = "~/RSV/git/RSV Genetic Diversity/Europe/NCBI_rsvA_wgs_europe_2015.csv", row.names = FALSE)
-write.csv(rsvB_meta_EU, file = "~/RSV/git/RSV Genetic Diversity/Europe/NCBI_rsvB_wgs_europe_2015.csv", row.names = FALSE)
+write.csv(rsvB_meta_EU, file = "~/RSV/git/RSV Genetic Diversity/Europe/NCBI_rsvB_wgs_europe_2015.csv", row.names = FALSE)'
 
 #Collection Season
 
