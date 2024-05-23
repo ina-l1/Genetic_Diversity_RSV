@@ -41,12 +41,12 @@ dist_rsvB <- dist.dna(aln_rsvB, model = "K80",
 
 # SNP distance with snp-dists
 snp_dist_rsvA <- read.csv("~/RSV/git/RSV Genetic Diversity/snpdist_rsvA.csv")
-rownames(snp_dist_rsvA) <- snp_dist_rsvA$snp.dists.0.7.0
-snp_dist_rsvA <- select(snp_dist_rsvA, -snp.dists.0.7.0)
+rownames(snp_dist_rsvA) <- snp_dist_rsvA[,1]
+snp_dist_rsvA <- snp_dist_rsvA[, -1]
 
 snp_dist_rsvB <- read.csv("~/RSV/git/RSV Genetic Diversity/snpdist_rsvB.csv")
-rownames(snp_dist_rsvB) <- snp_dist_rsvB$snp.dists.0.7.0
-snp_dist_rsvB <- select(snp_dist_rsvB, -snp.dists.0.7.0)
+rownames(snp_dist_rsvB) <- snp_dist_rsvB[, 1]
+snp_dist_rsvB <- snp_dist_rsvB[, -1]
 
 # Shannon Entropy
 'shannon_rsvA <- entropy(aln_shannon_rsvA)
