@@ -1,4 +1,4 @@
-#Pipeline: Add important metadata (Season, Clade), Data Sorting and Tree Visualization 
+#Add important metadata (Season, Clade), Data Sorting and Tree Visualization 
 
 library(dplyr)
 library(MMWRweek)

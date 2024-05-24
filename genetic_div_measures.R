@@ -1,4 +1,6 @@
-# Calculate Genetic Diverstiy 
+# Calculate Genetic Diversity
+# Visualize using MDS
+# Violin plots show genetic diversity within and between season 
 
 library(dplyr)
 library(ape)
