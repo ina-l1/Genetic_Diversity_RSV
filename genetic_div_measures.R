@@ -11,20 +11,25 @@ library(adegenet)
 library(usedist)
 
 # Read sequence alignment and metadata
-aln_rsvA <- read.FASTA("~/RSV/git/RSV Genetic Diversity/Germany/Sequences/rsvA_MAFFT_alignment.fasta")
-aln_rsvB <- read.FASTA("~/RSV/git/RSV Genetic Diversity/Germany/Sequences/rsvB_MAFFT_alignment.fasta")
+
+meta_rsvA <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/rsvA_ref_metadata_EU.csv")
+meta_rsvB <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/rsvB_ref_metadata_EU.csv")
+
+aln_rsvA <- read.FASTA("~/RSV/git/RSV Genetic Diversity/Europe/Sequences/rsvA_MAFFT_alignment_EU.fasta")
+aln_rsvB <- read.FASTA("~/RSV/git/RSV Genetic Diversity/Europe/Sequences/rsvB_MAFFT_alignment_EU.fasta")
+
+RefSeq_rsvA <- "NC_038235.1"
+RefSeq_rsvB <- "NC_001781.1"
 
 #aln_shannon_rsvA <- read.fasta("~/RSV/git/RSV Genetic Diversity/Sequences/rsvA_MAFFT_alignment.fasta")
  
-# Important metadata
-meta_rsvA <- read.csv("~/RSV/git/RSV Genetic Diversity/Germany/rsvA_ref_metadata.csv")
-meta_rsvA[2, "Collection_Season"] <- "Ref"
-meta_rsvA_short <- subset(meta_rsvA, select = c("Accession", "Type", "Collection_Date", "Collection_Season", "Collection_Month"))
+# Filter important metadata
+meta_rsvA[which(meta_rsvA$Accession == RefSeq_rsvA), "Collection_Season"] <- "Ref"
+meta_rsvA_short <- subset(meta_rsvA, select = c("Accession", "Type", "Collection_Date", "Collection_Season", "MMWRyear", "MMWRweek", "Country"))
 meta_rsvA_short$plotlabel <- paste(meta_rsvA_short$Accession, meta_rsvA_short$Type, meta_rsvA_short$Collection_Season, meta_rsvA_short$Collection_Month, sep = "_")
 
-meta_rsvB <- read.csv("~/RSV/git/RSV Genetic Diversity/Germany/rsvB_ref_metadata.csv")
-meta_rsvB[1, "Collection_Season"] <- "Ref"
-meta_rsvB_short <- subset(meta_rsvB, select = c("Accession", "Type", "Collection_Date", "Collection_Season", "Collection_Month"))
+meta_rsvB[which(meta_rsvB$Accession == RefSeq_rsvB), "Collection_Season"] <- "Ref"
+meta_rsvB_short <- subset(meta_rsvB, select = c("Accession", "Type", "Collection_Date", "Collection_Season", "MMWRyear", "MMWRweek", "Country"))
 meta_rsvB_short$plotlabel <- paste(meta_rsvB_short$Accession, meta_rsvB_short$Type, meta_rsvB_short$Collection_Season, meta_rsvB_short$Collection_Month, sep = "_")
 
 # Pairwise Distances from DNA Sequences
@@ -41,15 +46,15 @@ dist_rsvB <- dist.dna(aln_rsvB, model = "K80",
                       pairwise.deletion = FALSE,
                       as.matrix = TRUE)
 
-#write.csv(dist_rsvA, file = "~/RSV/git/RSV Genetic Diversity/Germany/pairdist_rsvA.csv")
-#write.csv(dist_rsvB, file = "~/RSV/git/RSV Genetic Diversity/Germany/pairdist_rsvB.csv")
+#write.csv(dist_rsvA, file = "~/RSV/git/RSV Genetic Diversity/Europe/pairdist_rsvA_EU.csv")
+#write.csv(dist_rsvB, file = "~/RSV/git/RSV Genetic Diversity/Europe/pairdist_rsvB_EU.csv")
 
 # SNP distance with snp-dists
-snp_dist_rsvA <- read.csv("~/RSV/git/RSV Genetic Diversity/Germany/snpdist_rsvA.csv")
+snp_dist_rsvA <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/snpdist_rsvA_EU.csv")
 rownames(snp_dist_rsvA) <- snp_dist_rsvA[,1]
 snp_dist_rsvA <- snp_dist_rsvA[, -1]
 
-snp_dist_rsvB <- read.csv("~/RSV/git/RSV Genetic Diversity/Germany/snpdist_rsvB.csv")
+snp_dist_rsvB <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/snpdist_rsvB_EU.csv")
 rownames(snp_dist_rsvB) <- snp_dist_rsvB[, 1]
 snp_dist_rsvB <- snp_dist_rsvB[, -1]
 
@@ -140,13 +145,15 @@ mds_snp_meta_rsvB <- cbind(meta_rsvB_short, df_mds_snp_rsvB)
 # MDS Plots
 
 # Pairwise distance
-plot_rsvA_mds_label <- ggplot(mds_meta_rsvA, aes(x = x_axis, y = y_axis, color = Collection_Season)) + #color = Collection_Season
+plot_rsvA_mds_label <- ggplot(mds_meta_rsvA, aes(x = x_axis, y = y_axis, color = Country)) + #color = Collection_Season
   geom_point() +
   geom_text(
-    label = paste(mds_meta_rsvA$Collection_Season, mds_meta_rsvA$Collection_Month, sep = "_"),
+    label = paste(mds_meta_rsvA$Collection_Season, mds_meta_rsvA$MMWRweek, sep = "_"),
     check_overlap = TRUE
-  )
+  ) 
 plot_rsvA_mds_label
+
+
 
 plot_rsvB_mds_label <- ggplot(mds_meta_rsvB, aes(x = x_axis, y = y_axis, color = Collection_Season)) +
   geom_point() +
