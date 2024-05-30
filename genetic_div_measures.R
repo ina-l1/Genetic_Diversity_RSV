@@ -11,18 +11,18 @@ library(adegenet)
 library(usedist)
 
 # Read sequence alignment and metadata
-aln_rsvA <- read.FASTA("~/RSV/git/RSV Genetic Diversity/Sequences/rsvA_MAFFT_alignment.fasta")
-aln_rsvB <- read.FASTA("~/RSV/git/RSV Genetic Diversity/Sequences/rsvB_MAFFT_alignment.fasta")
+aln_rsvA <- read.FASTA("~/RSV/git/RSV Genetic Diversity/Germany/Sequences/rsvA_MAFFT_alignment.fasta")
+aln_rsvB <- read.FASTA("~/RSV/git/RSV Genetic Diversity/Germany/Sequences/rsvB_MAFFT_alignment.fasta")
 
-aln_shannon_rsvA <- read.fasta("~/RSV/git/RSV Genetic Diversity/Sequences/rsvA_MAFFT_alignment.fasta")
-
+#aln_shannon_rsvA <- read.fasta("~/RSV/git/RSV Genetic Diversity/Sequences/rsvA_MAFFT_alignment.fasta")
+ 
 # Important metadata
-meta_rsvA <- read.csv("~/RSV/git/RSV Genetic Diversity/rsvA_ref_metadata.csv")
+meta_rsvA <- read.csv("~/RSV/git/RSV Genetic Diversity/Germany/rsvA_ref_metadata.csv")
 meta_rsvA[2, "Collection_Season"] <- "Ref"
 meta_rsvA_short <- subset(meta_rsvA, select = c("Accession", "Type", "Collection_Date", "Collection_Season", "Collection_Month"))
 meta_rsvA_short$plotlabel <- paste(meta_rsvA_short$Accession, meta_rsvA_short$Type, meta_rsvA_short$Collection_Season, meta_rsvA_short$Collection_Month, sep = "_")
 
-meta_rsvB <- read.csv("~/RSV/git/RSV Genetic Diversity/rsvB_ref_metadata.csv")
+meta_rsvB <- read.csv("~/RSV/git/RSV Genetic Diversity/Germany/rsvB_ref_metadata.csv")
 meta_rsvB[1, "Collection_Season"] <- "Ref"
 meta_rsvB_short <- subset(meta_rsvB, select = c("Accession", "Type", "Collection_Date", "Collection_Season", "Collection_Month"))
 meta_rsvB_short$plotlabel <- paste(meta_rsvB_short$Accession, meta_rsvB_short$Type, meta_rsvB_short$Collection_Season, meta_rsvB_short$Collection_Month, sep = "_")
@@ -41,12 +41,15 @@ dist_rsvB <- dist.dna(aln_rsvB, model = "K80",
                       pairwise.deletion = FALSE,
                       as.matrix = TRUE)
 
+#write.csv(dist_rsvA, file = "~/RSV/git/RSV Genetic Diversity/Germany/pairdist_rsvA.csv")
+#write.csv(dist_rsvB, file = "~/RSV/git/RSV Genetic Diversity/Germany/pairdist_rsvB.csv")
+
 # SNP distance with snp-dists
-snp_dist_rsvA <- read.csv("~/RSV/git/RSV Genetic Diversity/snpdist_rsvA.csv")
+snp_dist_rsvA <- read.csv("~/RSV/git/RSV Genetic Diversity/Germany/snpdist_rsvA.csv")
 rownames(snp_dist_rsvA) <- snp_dist_rsvA[,1]
 snp_dist_rsvA <- snp_dist_rsvA[, -1]
 
-snp_dist_rsvB <- read.csv("~/RSV/git/RSV Genetic Diversity/snpdist_rsvB.csv")
+snp_dist_rsvB <- read.csv("~/RSV/git/RSV Genetic Diversity/Germany/snpdist_rsvB.csv")
 rownames(snp_dist_rsvB) <- snp_dist_rsvB[, 1]
 snp_dist_rsvB <- snp_dist_rsvB[, -1]
 
