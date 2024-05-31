@@ -1,19 +1,84 @@
-#Project: Change in genetic diversity of RSV isolates over the course of one pandemic season in Germany
-#Data Sorting 
+# Project: Change in genetic diversity of RSV isolates over the course of one pandemic season in Germany
+# Data Sorting 
 
 library(dplyr)
+library(tidyr)
 library(MMWRweek)
+
+##################################################
+
+# Reference sequences
+
+RefSeq_rsvA <- read.csv("~/RSV/git/RSV Genetic Diversity/RefSeq/RefSeq_rsvA.csv")
+RefSeq_rsvB <- read.csv("~/RSV/git/RSV Genetic Diversity/RefSeq/RefSeq_rsvB.csv")
+
+##################################################
 
 # German sequences 
 
-'NCBI_wgs_df = read.csv("~/RSV/Genetic Diversity Project/NCBI_rsvA_wgs_germany_2015.csv") #NCBI RSV-A data
+# Sequence information for NCBI WGS sequences starting from 2014/2015 season 
+rsvA <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/NCBI_rsvA_wgs_europe_2015.csv")
+rsvB <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/NCBI_rsvB_wgs_europe_2015.csv")
 
-NCBI_wgs_df$Collection_Year = as.numeric(format(as.Date(NCBI_wgs_df$Collection_Date, format = "%m/%d/%Y"),"%Y"))
-NCBI_wgs_df$Collection_Month = as.numeric(format(as.Date(NCBI_wgs_df$Collection_Date, format = "%m/%d/%Y"),"%m"))
-NCBI_wgs_df$Collection_Season = ifelse(NCBI_wgs_df$Collection_Month >= 7 & NCBI_wgs_df$Collection_Month <= 12, paste(NCBI_wgs_df$Collection_Year,"/",NCBI_wgs_df$Collection_Year+1, sep = ""), paste(NCBI_wgs_df$Collection_Year-1,"/",NCBI_wgs_df$Collection_Year, sep = ""))
+rsvA_nextclade <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/nextclade_rsvA_EU.csv") #Nextclade output
+rsvB_nextclade <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/nextclade_rsvB_EU.csv")
 
-numberofisolates = as.data.frame.matrix(table(NCBI_wgs_df$Collection_Season))
-colnames(numberofisolates) = c("Season", "number_of_isolates")'
+# Reformat Dates
+rsvA$Collection_Date <- as.Date(rsvA$Collection_Date, format = "%Y-%m-%d") #%m/%d/%Y
+rsvB$Collection_Date <- as.Date(rsvB$Collection_Date, format = "%Y-%m-%d")
+
+rsvA$Collection_Year <- as.numeric(format(rsvA$Collection_Date,"%Y"))
+rsvA$Collection_Month <- as.numeric(format(rsvA$Collection_Date,"%m"))
+
+rsvB$Collection_Year <- as.numeric(format(rsvB$Collection_Date, "%Y"))
+rsvB$Collection_Month <- as.numeric(format(rsvB$Collection_Date, "%m"))
+
+# RSV epidemic season in Germany from Week 40 to Week 39 of next year (October)
+rsvAMMWR <- MMWRweek(rsvA$Collection_Date)
+rsvBMMWR <- MMWRweek(rsvB$Collection_Date)
+rsvA$MMWRyear <- rsvAMMWR$MMWRyear
+rsvA$MMWRweek <- rsvAMMWR$MMWRweek
+rsvA$MMWRday <- rsvAMMWR$MMWRday
+rsvB$MMWRyear <- rsvBMMWR$MMWRyear
+rsvB$MMWRweek <- rsvBMMWR$MMWRweek
+rsvB$MMWRday <- rsvBMMWR$MMWRday
+
+rsvA$Collection_Season <- ifelse(rsvA$MMWRweek >= 1 & rsvA$MMWRweek <= 39, paste(rsvA$MMWRyear-1,"/",rsvA$MMWRyear, sep = ""), paste(rsvA$MMWRyear,"/",rsvA$MMWRyear+1, sep = ""))
+rsvB$Collection_Season <- ifelse(rsvB$MMWRweek >= 1 & rsvB$MMWRweek <= 39, paste(rsvB$MMWRyear-1,"/",rsvB$MMWRyear, sep = ""), paste(rsvB$MMWRyear,"/",rsvB$MMWRyear+1, sep = ""))
+
+# A and B in one table
+rsvA$Type <- "A"
+rsvB$Type <- "B"
+rsvAB <- rbind(rsvA, rsvB)
+
+# rsvA + RefSeqA, rsvB + RefSeqB
+rsvA_ref <- full_join(rsvA, RefSeq_rsvA, by = join_by(Accession, Organism_Name, Organization, Org_location, Isolate,
+                                               Molecule_type, Length, Nuc_Completeness, Country, Collection_Date, GenBank_Title))
+rsvB_ref <- full_join(rsvB, RefSeq_rsvB, by = join_by(Accession, Organism_Name, Organization, Org_location, Isolate,
+                                               Molecule_type, Length, Nuc_Completeness, Country, Collection_Date, GenBank_Title))
+
+# Sort dataframes
+rsvA <- rsvA[order(rsvA$Accession),]
+rsvB <- rsvB[order(rsvB$Accession),]
+rsvAB <- rsvAB[order(rsvAB$Accession),]
+rsvA_ref <- rsvA_ref[order(rsvA_ref$Accession),]
+rsvB_ref <- rsvB_ref[order(rsvB_ref$Accession),]
+
+# Add nextclade clade information to metadata
+rsvA_nextclade <- arrange(rsvA_nextclade, seqName)
+rsvB_nextclade <- arrange(rsvB_nextclade, seqName)
+rsvA_clades <- rsvA_nextclade[c("clade", "G_clade")]
+rsvB_clades <- rsvB_nextclade[c("clade", "G_clade")]
+rsvA_ref <- cbind(rsvA_ref, rsvA_clades)
+rsvB_ref <- cbind(rsvB_ref, rsvB_clades)
+
+# Export metadata
+'write.csv(rsvA_ref, file = "~/RSV/git/RSV Genetic Diversity/rsvA_ref_metadata.csv", row.names = FALSE)
+write.csv(rsvB_ref, file = "~/RSV/git/RSV Genetic Diversity/rsvB_ref_metadata.csv", row.names = FALSE)'
+
+write.csv(rsvAB, file = "~/RSV/git/RSV Genetic Diversity/Europe/rsvAB_metadata_EU.csv")
+
+##########################################################
 
 # European sequences
 
@@ -28,9 +93,6 @@ rsvB_meta_EU$Collection_Date <- as.Date(rsvB_meta_EU$Collection_Date, format = "
 
 #write.csv(rsvA_meta_EU, file = "~/RSV/git/RSV Genetic Diversity/Europe/NCBI_rsvA_wgs_europe_2015.csv", row.names = FALSE)
 #write.csv(rsvB_meta_EU, file = "~/RSV/git/RSV Genetic Diversity/Europe/NCBI_rsvB_wgs_europe_2015.csv", row.names = FALSE)
-
-RefSeq_rsvA <- read.csv("~/RSV/git/RSV Genetic Diversity/RefSeq/RefSeq_rsvA.csv")
-RefSeq_rsvB <- read.csv("~/RSV/git/RSV Genetic Diversity/RefSeq/RefSeq_rsvB.csv")
 
 rsvA_nextclade_EU <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/nextclade_rsvA_EU.csv")
 rsvB_nextclade_EU <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/nextclade_rsvB_EU.csv")

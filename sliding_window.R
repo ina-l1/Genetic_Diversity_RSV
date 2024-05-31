@@ -71,7 +71,7 @@ snpdist_rsvB <- snpdist_rsvB %>% select(order(colnames(.)))
 
 # Distgroups
 
-#Pairwise
+#Pairwise    
 group_pairdist_rsvA <- dist_groups(pairdist_rsvA, meta_rsvA$Collection_YearWeek)
 within_pairdist_rsvA <- subset(group_pairdist_rsvA, Group1 == Group2)
 
