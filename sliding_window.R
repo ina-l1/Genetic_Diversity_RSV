@@ -26,6 +26,11 @@ pairdist_rsvB <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/pairdist_rsvB_
 snpdist_rsvA <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/snpdist_rsvA_EU.csv")
 snpdist_rsvB <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/snpdist_rsvB_EU.csv")
 
+# Hamming 
+
+hamdist_rsvA <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/snpdist_rsvA_protein.csv")
+hamdist_rsvB <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/snpdist_rsvB_protein.csv")
+
 # Metadata: Add Year/Week for window
 
 meta_rsvA$Collection_YearWeek <- paste(meta_rsvA$MMWRyear, 
@@ -68,6 +73,20 @@ rownames(snpdist_rsvB) <- snpdist_rsvB$Accession
 snpdist_rsvB$Accession <- NULL
 snpdist_rsvB <- snpdist_rsvB %>% select(order(colnames(.)))
 
+#Hamming
+hamdist_rsvA <- arrange(hamdist_rsvA, hamdist_rsvA[,1])
+hamdist_rsvA <- hamdist_rsvA[,-1]
+hamdist_rsvA$Accession <- meta_rsvA$Accession #shorter name
+rownames(hamdist_rsvA) <- hamdist_rsvA$Accession
+hamdist_rsvA$Accession <- NULL
+hamdist_rsvA <- hamdist_rsvA %>% select(order(colnames(.)))
+
+hamdist_rsvB <- arrange(hamdist_rsvB, hamdist_rsvB[,1])
+hamdist_rsvB <- hamdist_rsvB[,-1]
+hamdist_rsvB$Accession <- meta_rsvB$Accession #shorter name
+rownames(hamdist_rsvB) <- hamdist_rsvB$Accession
+hamdist_rsvB$Accession <- NULL
+hamdist_rsvB <- hamdist_rsvB %>% select(order(colnames(.)))
 
 # Distgroups
 
@@ -79,7 +98,7 @@ group_pairdist_rsvB <- dist_groups(pairdist_rsvB, meta_rsvB$Collection_YearWeek)
 within_pairdist_rsvB <- subset(group_pairdist_rsvB, Group1 == Group2)
 
 colnames(within_pairdist_rsvA)[1] <- "Accession"
-within_pairdist_rsvA$Year <- meta_rsvA$MMWRyear[match(within_pairdist_rsvA$Accession, meta_rsvA$Accession)]
+within_pairdist_rsvA$Year <- meta_rsvA$MMWRyear[match(within_pairdist_rsvA$Accession, meta_rsvA$Accession)] #SVERWEIS/VLOOKUP
 within_pairdist_rsvA$Week <- meta_rsvA$MMWRweek[match(within_pairdist_rsvA$Accession, meta_rsvA$Accession)]
 within_pairdist_rsvA$Date <- decimal_date(MMWRweek2Date(within_pairdist_rsvA$Year, within_pairdist_rsvA$Week))
 
@@ -111,6 +130,26 @@ within_snpdist_rsvB$Date <- decimal_date(MMWRweek2Date(within_snpdist_rsvB$Year,
 stats_snpdist_rsvA <- summarySE(data = within_snpdist_rsvA, measurevar = "Distance", groupvars = "Date") #mean, standard deviation, standard error of the mean, and a (default 95%) confidence interval
 stats_snpdist_rsvB <- summarySE(data = within_snpdist_rsvB, measurevar = "Distance", groupvars = "Date")
 
+#Ham
+group_hamdist_rsvA <- dist_groups(hamdist_rsvA, meta_rsvA$Collection_YearWeek)
+within_hamdist_rsvA <- subset(group_hamdist_rsvA, Group1 == Group2)
+
+group_hamdist_rsvB <- dist_groups(hamdist_rsvB, meta_rsvB$Collection_YearWeek)
+within_hamdist_rsvB <- subset(group_hamdist_rsvB, Group1 == Group2)
+
+colnames(within_hamdist_rsvA)[1] <- "Accession"
+within_hamdist_rsvA$Year <- meta_rsvA$MMWRyear[match(within_hamdist_rsvA$Accession, meta_rsvA$Accession)]
+within_hamdist_rsvA$Week <- meta_rsvA$MMWRweek[match(within_hamdist_rsvA$Accession, meta_rsvA$Accession)]
+within_hamdist_rsvA$Date <- decimal_date(MMWRweek2Date(within_hamdist_rsvA$Year, within_hamdist_rsvA$Week))
+
+colnames(within_hamdist_rsvB)[1] <- "Accession"
+within_hamdist_rsvB$Year <- meta_rsvB$MMWRyear[match(within_hamdist_rsvB$Accession, meta_rsvB$Accession)]
+within_hamdist_rsvB$Week <- meta_rsvB$MMWRweek[match(within_hamdist_rsvB$Accession, meta_rsvB$Accession)]
+within_hamdist_rsvB$Date <- decimal_date(MMWRweek2Date(within_hamdist_rsvB$Year, within_hamdist_rsvB$Week))
+
+stats_hamdist_rsvA <- summarySE(data = within_hamdist_rsvA, measurevar = "Distance", groupvars = "Date") #mean, standard deviation, standard error of the mean, and a (default 95%) confidence interval
+stats_hamdist_rsvB <- summarySE(data = within_hamdist_rsvB, measurevar = "Distance", groupvars = "Date")
+
 # Plot
 
 #Pairwise
@@ -118,15 +157,36 @@ ggplot(stats_pairdist_rsvA, aes(x = Date, y = Distance)) +
   geom_errorbar(aes(ymin = Distance-se, ymax = Distance+se)) +
   geom_point()
 
+ggsave(filename = "~/RSV/git/Plots/weekly_rsvA_pair_EU.png", width = 50, height = 20, units = "cm", limitsize = FALSE)
+
 ggplot(stats_pairdist_rsvB, aes(x = Date, y = Distance)) +
   geom_errorbar(aes(ymin = Distance-se, ymax = Distance+se)) +
   geom_point()
+
+ggsave(filename = "~/RSV/git/Plots/weekly_rsvB_pair_EU.png", width = 50, height = 20, units = "cm", limitsize = FALSE)
 
 #SNP
 ggplot(stats_snpdist_rsvA, aes(x = Date, y = Distance)) +
   geom_errorbar(aes(ymin = Distance-se, ymax = Distance+se)) +
   geom_point()
 
+ggsave(filename = "~/RSV/git/Plots/weekly_rsvA_snp_EU.png", width = 50, height = 20, units = "cm", limitsize = FALSE)
+
 ggplot(stats_snpdist_rsvB, aes(x = Date, y = Distance)) +
   geom_errorbar(aes(ymin = Distance-se, ymax = Distance+se)) +
   geom_point()
+
+ggsave(filename = "~/RSV/git/Plots/weekly_rsvB_snp_EU.png", width = 50, height = 20, units = "cm", limitsize = FALSE)
+
+#Hamming
+ggplot(stats_hamdist_rsvA, aes(x = Date, y = Distance)) +
+  geom_errorbar(aes(ymin = Distance-se, ymax = Distance+se)) +
+  geom_point()
+
+ggsave(filename = "~/RSV/git/Plots/weekly_rsvA_ham_EU.png", width = 50, height = 20, units = "cm", limitsize = FALSE)
+
+ggplot(stats_hamdist_rsvB, aes(x = Date, y = Distance)) +
+  geom_errorbar(aes(ymin = Distance-se, ymax = Distance+se)) +
+  geom_point()
+
+ggsave(filename = "~/RSV/git/Plots/weekly_rsvB_ham_EU.png", width = 50, height = 20, units = "cm", limitsize = FALSE)
