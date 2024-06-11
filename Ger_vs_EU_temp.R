@@ -82,6 +82,7 @@ snpdist_rsvB_EU <- snpdist_rsvB_EU %>% select(order(colnames(.)))
 group_snpdist_rsvA_GER <- dist_groups(snpdist_rsvA_GER, meta_rsvA_GER$Collection_YearWeek)
 within_snpdist_rsvA_GER <- subset(group_snpdist_rsvA_GER, Group1 == Group2)
 between_snpdist_rsvA_GER <- subset(group_snpdist_rsvA_GER, Group1 != Group2)
+#between_snpdist_rsvA_GER$Between_Season <- paste(between_snpdist_rsvA_GER$Group1, "&", between_snpdist_rsvA_GER$Group2, sep = "")
 
 colnames(within_snpdist_rsvA_GER)[1] <- "Accession"
 within_snpdist_rsvA_GER$Year <- meta_rsvA_GER$MMWRyear[match(within_snpdist_rsvA_GER$Accession, meta_rsvA_GER$Accession)]
@@ -133,7 +134,8 @@ plot_snpdist_rsvA <- ggplot(stats_snpdist_rsvA_GER, aes(x = Date, y = Distance))
   geom_errorbar(color = "grey", data = stats_snpdist_rsvA_EU, aes(ymin = Distance-se, ymax = Distance+se)) +
   geom_point(data = stats_snpdist_rsvA_EU, color = "blue")
 plot_snpdist_rsvA
-ggsave(filename = "~/RSV/git/Plots/weekly_rsvA_snp_GER-EU.png", width = 50, height = 20, units = "cm", limitsize = FALSE)
+#ggsave(filename = "~/RSV/git/Plots/weekly_rsvA_snp_GER-EU.png", width = 50, height = 20, units = "cm", limitsize = FALSE)
+
 ### RSV B
 plot_snpdist_rsvB <- ggplot(stats_snpdist_rsvB_GER, aes(x = Date, y = Distance)) +
   geom_errorbar(color = "grey", aes(ymin = Distance-se, ymax = Distance+se)) +
@@ -141,4 +143,43 @@ plot_snpdist_rsvB <- ggplot(stats_snpdist_rsvB_GER, aes(x = Date, y = Distance))
   geom_errorbar(color = "grey", data = stats_snpdist_rsvB_EU, aes(ymin = Distance-se, ymax = Distance+se)) +
   geom_point(data = stats_snpdist_rsvB_EU, color = "blue")
 plot_snpdist_rsvB
-ggsave(filename = "~/RSV/git/Plots/weekly_rsvB_snp_GER-EU.png", width = 50, height = 20, units = "cm", limitsize = FALSE)
+#ggsave(filename = "~/RSV/git/Plots/weekly_rsvB_snp_GER-EU.png", width = 50, height = 20, units = "cm", limitsize = FALSE)
+
+################################################################
+# Sliding Window
+# Timeframe: 3 weeks 
+
+# Define windows 
+# Start: 2014 W40
+# End: 2023 W39
+# 2015 and 2020 have 53 instead of 53 weeks
+
+# Creating df with weeks for each year
+
+week <- rep(c(1:53), times = 10)
+year <- rep(c(2014:2023), each = 53)
+dates_df <- data.frame(year, week)
+
+vec <- which(dates_df$week == 53 & (dates_df$year != 2015 & dates_df$year!=2020)) #years with no 53rd week
+vec <- append(vec, which((between(dates_df$week, 1, 39) & dates_df$year == 2014)|(between(dates_df$week, 40, 53) & dates_df$year == 2023)))
+
+dates_df <- dates_df[-vec,]
+
+dates_df$date <- decimal_date(MMWRweek2Date(dates_df$year, dates_df$week))
+
+dates_df$index <- 1:nrow(dates_df)
+rownames(dates_df) <- dates_df$index
+
+# Defining window with start and end date
+
+sliding_window <- data.frame(matrix(ncol = 3))
+colnames(sliding_window) <- c("index","start_date","end_date")
+sliding_window <- sliding_window[-1,]
+
+for(i in 1:(nrow(dates_df)-2)) {
+  sliding_window[i,"index"] <- i
+  sliding_window[i,"start_date"] <- dates_df$date[i]
+  sliding_window[i,"end_date"] <- dates_df$date[i+2]
+}
+
+# Assign window to collection date
