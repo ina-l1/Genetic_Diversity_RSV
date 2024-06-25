@@ -13,23 +13,23 @@ library(MMWRweek)
 library(Rmisc)
 
 # Read metadata
-meta_rsvA <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/rsvA_ref_metadata_EU.csv") #already in alphabetical order
-meta_rsvB <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/rsvB_ref_metadata_EU.csv")
+meta_rsvA <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvA_ref_metadata_EU.csv") #already in alphabetical order
+meta_rsvB <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvB_ref_metadata_EU.csv")
 
 # Read distance matrices 
 
 # Pairwise
-pairdist_rsvA <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/pairdist_rsvA_EU.csv")
-pairdist_rsvB <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/pairdist_rsvB_EU.csv")
+pairdist_rsvA <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/pairdist_rsvA_EU.csv")
+pairdist_rsvB <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/pairdist_rsvB_EU.csv")
 
 # SNP
-snpdist_rsvA <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/snpdist_rsvA_EU.csv")
-snpdist_rsvB <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/snpdist_rsvB_EU.csv")
+snpdist_rsvA <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/snpdist_rsvA_EU.csv")
+snpdist_rsvB <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/snpdist_rsvB_EU.csv")
 
 # Hamming 
 
-hamdist_rsvA <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/snpdist_rsvA_protein.csv")
-hamdist_rsvB <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/snpdist_rsvB_protein.csv")
+hamdist_rsvA <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/snpdist_rsvA_protein.csv")
+hamdist_rsvB <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/snpdist_rsvB_protein.csv")
 
 # Metadata: Add Year/Week for window
 
@@ -157,36 +157,36 @@ ggplot(stats_pairdist_rsvA, aes(x = Date, y = Distance)) +
   geom_errorbar(aes(ymin = Distance-se, ymax = Distance+se)) +
   geom_point()
 
-ggsave(filename = "~/RSV/git/Plots/weekly_rsvA_pair_EU.png", width = 50, height = 20, units = "cm", limitsize = FALSE)
+#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/Plots/weekly_rsvA_pair_EU.png", width = 50, height = 20, units = "cm", limitsize = FALSE)
 
 ggplot(stats_pairdist_rsvB, aes(x = Date, y = Distance)) +
   geom_errorbar(aes(ymin = Distance-se, ymax = Distance+se)) +
   geom_point()
 
-ggsave(filename = "~/RSV/git/Plots/weekly_rsvB_pair_EU.png", width = 50, height = 20, units = "cm", limitsize = FALSE)
+#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/weekly_rsvB_pair_EU.png", width = 50, height = 20, units = "cm", limitsize = FALSE)
 
 #SNP
 ggplot(stats_snpdist_rsvA, aes(x = Date, y = Distance)) +
   geom_errorbar(aes(ymin = Distance-se, ymax = Distance+se)) +
   geom_point()
 
-ggsave(filename = "~/RSV/git/Plots/weekly_rsvA_snp_EU.png", width = 50, height = 20, units = "cm", limitsize = FALSE)
+#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/weekly_rsvA_snp_EU.png", width = 50, height = 20, units = "cm", limitsize = FALSE)
 
 ggplot(stats_snpdist_rsvB, aes(x = Date, y = Distance)) +
   geom_errorbar(aes(ymin = Distance-se, ymax = Distance+se)) +
   geom_point()
 
-ggsave(filename = "~/RSV/git/Plots/weekly_rsvB_snp_EU.png", width = 50, height = 20, units = "cm", limitsize = FALSE)
+#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/weekly_rsvB_snp_EU.png", width = 50, height = 20, units = "cm", limitsize = FALSE)
 
 #Hamming
 ggplot(stats_hamdist_rsvA, aes(x = Date, y = Distance)) +
   geom_errorbar(aes(ymin = Distance-se, ymax = Distance+se)) +
   geom_point()
 
-ggsave(filename = "~/RSV/git/Plots/weekly_rsvA_ham_EU.png", width = 50, height = 20, units = "cm", limitsize = FALSE)
+#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/weekly_rsvA_ham_EU.png", width = 50, height = 20, units = "cm", limitsize = FALSE)
 
 ggplot(stats_hamdist_rsvB, aes(x = Date, y = Distance)) +
   geom_errorbar(aes(ymin = Distance-se, ymax = Distance+se)) +
   geom_point()
 
-ggsave(filename = "~/RSV/git/Plots/weekly_rsvB_ham_EU.png", width = 50, height = 20, units = "cm", limitsize = FALSE)
+#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/weekly_rsvB_ham_EU.png", width = 50, height = 20, units = "cm", limitsize = FALSE)

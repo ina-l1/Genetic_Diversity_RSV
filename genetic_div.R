@@ -13,16 +13,16 @@ library(usedist)
 
 # Read sequence alignment and metadata
 
-meta_rsvA <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/rsvA_ref_metadata_EU.csv")
-meta_rsvB <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/rsvB_ref_metadata_EU.csv")
+meta_rsvA <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvA_ref_metadata_EU.csv")
+meta_rsvB <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvB_ref_metadata_EU.csv")
 
-aln_rsvA <- read.FASTA("~/RSV/git/RSV Genetic Diversity/Europe/Sequences/rsvA_MAFFT_alignment_EU.fasta")
-aln_rsvB <- read.FASTA("~/RSV/git/RSV Genetic Diversity/Europe/Sequences/rsvB_MAFFT_alignment_EU.fasta")
+aln_rsvA <- read.FASTA("~/Yale_Projects/Genetic_Diversity_RSV/Europe/Sequences/rsvA_MAFFT_alignment_EU.fasta")
+aln_rsvB <- read.FASTA("~/Yale_Projects/Genetic_Diversity_RSV/Europe/Sequences/rsvB_MAFFT_alignment_EU.fasta")
 
 RefSeq_rsvA <- "NC_038235.1"
 RefSeq_rsvB <- "NC_001781.1"
 
-#aln_shannon_rsvA <- read.fasta("~/RSV/git/RSV Genetic Diversity/Sequences/rsvA_MAFFT_alignment.fasta")
+#aln_shannon_rsvA <- read.fasta("~/Yale_Projects/Genetic_Diversity_RSV/Sequences/rsvA_MAFFT_alignment.fasta")
  
 # Filter important metadata
 meta_rsvA[which(meta_rsvA$Accession == RefSeq_rsvA), "Collection_Season"] <- "Ref"
@@ -48,26 +48,26 @@ dist_rsvB <- dist.dna(aln_rsvB, model = "K80",
                       pairwise.deletion = FALSE,
                       as.matrix = TRUE)
 
-#write.csv(dist_rsvA, file = "~/RSV/git/RSV Genetic Diversity/Europe/pairdist_rsvA_EU.csv")
-#write.csv(dist_rsvB, file = "~/RSV/git/RSV Genetic Diversity/Europe/pairdist_rsvB_EU.csv")
+#write.csv(dist_rsvA, file = "~/Yale_Projects/Genetic_Diversity_RSV/Europe/pairdist_rsvA_EU.csv")
+#write.csv(dist_rsvB, file = "~/Yale_Projects/Genetic_Diversity_RSV/Europe/pairdist_rsvB_EU.csv")
 
 # SNP distance with snp-dists
 
-snp_dist_rsvA <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/snpdist_rsvA_EU.csv")
+snp_dist_rsvA <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/snpdist_rsvA_EU.csv")
 rownames(snp_dist_rsvA) <- snp_dist_rsvA[,1]
 snp_dist_rsvA <- snp_dist_rsvA[, -1]
 
-snp_dist_rsvB <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/snpdist_rsvB_EU.csv")
+snp_dist_rsvB <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/snpdist_rsvB_EU.csv")
 rownames(snp_dist_rsvB) <- snp_dist_rsvB[, 1]
 snp_dist_rsvB <- snp_dist_rsvB[, -1]
 
 # Hamming Distance
 
-ham_dist_rsvA <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/snpdist_rsvA_protein.csv")
+ham_dist_rsvA <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/snpdist_rsvA_protein.csv")
 rownames(ham_dist_rsvA) <- ham_dist_rsvA[, 1]
 ham_dist_rsvA <- ham_dist_rsvA[, -1]
 
-ham_dist_rsvB <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/snpdist_rsvB_protein.csv")
+ham_dist_rsvB <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/snpdist_rsvB_protein.csv")
 rownames(ham_dist_rsvB) <- ham_dist_rsvB[, 1]
 ham_dist_rsvB <- ham_dist_rsvB[, -1]
 
@@ -258,7 +258,7 @@ plot_rsvA_mds_label_noref <- ggplot(mds_noref_rsvA, aes(x = x_axis, y = y_axis, 
   )
 plot_rsvA_mds_label_noref
 
-#ggsave(filename = "~/RSV/git/Plots/mds_pair_rsvA_noref_EU.png", width = 25, height = 20, units = "cm", limitsize = FALSE)
+#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/Plots/mds_pair_rsvA_noref_EU.png", width = 25, height = 20, units = "cm", limitsize = FALSE)
 
 mds_noref_rsvB <- filter(mds_meta_rsvB, Collection_Season != "Ref")
 
@@ -274,7 +274,7 @@ plot_rsvB_mds_label_noref <- ggplot(mds_noref_rsvB, aes(x = x_axis, y = y_axis, 
   )
 plot_rsvB_mds_label_noref
 
-#ggsave(filename = "~/RSV/git/Plots/mds_pair_rsvB_noref_EU.png", width = 25, height = 20, units = "cm", limitsize = FALSE)
+#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/Plots/mds_pair_rsvB_noref_EU.png", width = 25, height = 20, units = "cm", limitsize = FALSE)
 
 # SNP distance 
 mds_snp_noref_rsvA <- filter(mds_snp_meta_rsvA, Collection_Season != "Ref")
@@ -291,7 +291,7 @@ plot_rsvA_mds_snp_label_noref <- ggplot(mds_snp_noref_rsvA, aes(x = x_axis, y = 
   )
 plot_rsvA_mds_snp_label_noref
 
-#ggsave(filename = "~/RSV/git/Plots/mds_snp_rsvA_noref_Country_EU.png", width = 25, height = 20, units = "cm", limitsize = FALSE)
+#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/Plots/mds_snp_rsvA_noref_Country_EU.png", width = 25, height = 20, units = "cm", limitsize = FALSE)
 
 mds_snp_noref_rsvB <- filter(mds_snp_meta_rsvB, Collection_Season != "Ref")
 
@@ -307,7 +307,7 @@ plot_rsvB_mds_snp_label_noref <- ggplot(mds_snp_noref_rsvB, aes(x = x_axis, y = 
   )
 plot_rsvB_mds_snp_label_noref
 
-#ggsave(filename = "~/RSV/git/Plots/mds_snp_rsvB_noref_Country_EU.png", width = 25, height = 20, units = "cm", limitsize = FALSE)
+#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/Plots/mds_snp_rsvB_noref_Country_EU.png", width = 25, height = 20, units = "cm", limitsize = FALSE)
 
 # Hamming distance
 mds_ham_noref_rsvA <- filter(mds_ham_meta_rsvA, Collection_Season != "Ref")
@@ -324,7 +324,7 @@ plot_rsvA_mds_ham_label_noref <- ggplot(mds_ham_noref_rsvA, aes(x = x_axis, y = 
   )
 plot_rsvA_mds_ham_label_noref
 
-ggsave(filename = "~/RSV/git/Plots/mds_ham_rsvA_noref_Country_EU.png", width = 45, height = 40, units = "cm", limitsize = FALSE)
+#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/Plots/mds_ham_rsvA_noref_Country_EU.png", width = 45, height = 40, units = "cm", limitsize = FALSE)
 
 mds_ham_noref_rsvB <- filter(mds_ham_meta_rsvB, Collection_Season != "Ref")
 
@@ -340,7 +340,7 @@ plot_rsvB_mds_ham_label_noref <- ggplot(mds_ham_noref_rsvB, aes(x = x_axis, y = 
   )
 plot_rsvB_mds_ham_label_noref
 
-#ggsave(filename = "~/RSV/git/Plots/mds_snp_rsvB_noref_Country_EU.png", width = 45, height = 40, units = "cm", limitsize = FALSE)
+#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/Plots/mds_snp_rsvB_noref_Country_EU.png", width = 45, height = 40, units = "cm", limitsize = FALSE)
 
 # Violin Plot 
 
@@ -363,7 +363,7 @@ plot_violin_pair_within_rsvA <- ggplot(distgroup_within_pair_rsvA, aes(x = Seaso
                geom = "crossbar", width = 0.05, color = "red")
 plot_violin_pair_within_rsvA
 
-ggsave(filename = "~/RSV/git/Plots/violin_rsvA_pair_within_EU.png", width = 25, height = 20, units = "cm", limitsize = FALSE)
+#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/Plots/violin_rsvA_pair_within_EU.png", width = 25, height = 20, units = "cm", limitsize = FALSE)
 
 plot_violin_pair_between_rsvA <- ggplot(distgroup_between_pair_rsvA, aes(x = Between_Season, y = Distance)) +
   geom_violin()
@@ -390,7 +390,7 @@ plot_violin_pair_rsvB <- ggplot(distgroup_within_pair_rsvB, aes(x = Within_Seaso
                geom = "crossbar", width = 0.05, color = "red")
 plot_violin_pair_rsvB
 
-ggsave(filename = "~/RSV/git/Plots/violin_rsvB_pair_within_EU.png", width = 25, height = 20, units = "cm", limitsize = FALSE)
+#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/Plots/violin_rsvB_pair_within_EU.png", width = 25, height = 20, units = "cm", limitsize = FALSE)
 
 plot_violin_pair_between_rsvB <- ggplot(distgroup_between_pair_rsvB, aes(x = Between_Season, y = Distance)) +
   geom_violin()
@@ -415,7 +415,7 @@ plot_violin_snp_rsvA <- ggplot(distgroup_within_snp_rsvA, aes(x = Season, y = Di
                geom = "crossbar", width = 0.05, color = "red")
 plot_violin_snp_rsvA
 
-ggsave(filename = "~/RSV/git/Plots/violin_rsvA_snp_within_EU.png", width = 25, height = 20, units = "cm", limitsize = FALSE)
+#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/Plots/violin_rsvA_snp_within_EU.png", width = 25, height = 20, units = "cm", limitsize = FALSE)
 
 plot_violin_snp_between_rsvA <- ggplot(distgroup_between_snp_rsvA, aes(x = Between_Season, y = Distance)) +
   geom_violin()
@@ -440,7 +440,7 @@ plot_violin_snp_rsvB <- ggplot(distgroup_within_snp_rsvB, aes(x = Within_Season,
                geom = "crossbar", width = 0.05, color = "red")
 plot_violin_snp_rsvB
 
-ggsave(filename = "~/RSV/git/Plots/violin_rsvB_snp_within_EU.png", width = 25, height = 20, units = "cm", limitsize = FALSE)
+#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/Plots/violin_rsvB_snp_within_EU.png", width = 25, height = 20, units = "cm", limitsize = FALSE)
 
 plot_violin_snp_between_rsvB <- ggplot(distgroup_between_snp_rsvB, aes(x = Between_Season, y = Distance)) +
   geom_violin()
@@ -465,7 +465,7 @@ plot_violin_ham_rsvA <- ggplot(distgroup_within_ham_rsvA, aes(x = Season, y = Di
                geom = "crossbar", width = 0.05, color = "red")
 plot_violin_ham_rsvA
 
-ggsave(filename = "~/RSV/git/Plots/violin_rsvA_ham_within_EU.png", width = 25, height = 20, units = "cm", limitsize = FALSE)
+#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/Plots/violin_rsvA_ham_within_EU.png", width = 25, height = 20, units = "cm", limitsize = FALSE)
 
 plot_violin_ham_between_rsvA <- ggplot(distgroup_between_ham_rsvA, aes(x = Between_Season, y = Distance)) +
   geom_violin()
@@ -490,7 +490,7 @@ plot_violin_ham_rsvB <- ggplot(distgroup_within_ham_rsvB, aes(x = Within_Season,
                geom = "crossbar", width = 0.05, color = "red")
 plot_violin_ham_rsvB
 
-ggsave(filename = "~/RSV/git/Plots/violin_rsvB_ham_within_EU.png", width = 25, height = 20, units = "cm", limitsize = FALSE)
+#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/Plots/violin_rsvB_ham_within_EU.png", width = 25, height = 20, units = "cm", limitsize = FALSE)
 
 plot_violin_ham_between_rsvB <- ggplot(distgroup_between_ham_rsvB, aes(x = Between_Season, y = Distance)) +
   geom_violin()

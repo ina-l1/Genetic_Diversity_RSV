@@ -5,7 +5,7 @@ library(tidyr)
 library(ggplot2)
 
 # Read metadata
-rsvAB <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/rsvAB_metadata_EU.csv", row.names = 1)
+rsvAB <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvAB_metadata_EU.csv", row.names = 1)
 rsvAB$Collection_Date <- as.Date(rsvAB$Collection_Date, format = "%Y-%m-%d") #%m/%d/%Y
 
 # Number of sequences per season

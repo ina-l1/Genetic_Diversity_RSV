@@ -9,17 +9,17 @@ library(treeio)
 library(ggtree)
 
 # Metadata
-RefSeq_rsvA <- read.csv("~/RSV/git/RSV Genetic Diversity/RefSeq/RefSeq_rsvA.csv")
-RefSeq_rsvB <- read.csv("~/RSV/git/RSV Genetic Diversity/RefSeq/RefSeq_rsvB.csv")
+RefSeq_rsvA <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/RefSeq/RefSeq_rsvA.csv")
+RefSeq_rsvB <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/RefSeq/RefSeq_rsvB.csv")
 
-rsvA_ref <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/rsvA_ref_metadata_EU.csv")
-rsvB_ref <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/rsvB_ref_metadata_EU.csv")
+rsvA_ref <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvA_ref_metadata_EU.csv")
+rsvB_ref <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvB_ref_metadata_EU.csv")
 
 rsvA_ref$Collection_Date <- as.Date(rsvA_ref$Collection_Date, format = "%Y-%m-%d") #%m/%d/%Y
 rsvB_ref$Collection_Date <- as.Date(rsvB_ref$Collection_Date, format = "%Y-%m-%d") #%m/%d/%Y
 
 # Tree visualization: RSV A
-tree_A <- read.tree("~/RSV/git/RSV Genetic Diversity/Europe/Treefiles/tree_rsvA_MAFFT_alignment_EU.treefile") #read.nexus for NEXUS format, read.tree for Newick format
+tree_A <- read.tree("~/Yale_Projects/Genetic_Diversity_RSV/Europe/Treefiles/tree_rsvA_MAFFT_alignment_EU.treefile") #read.nexus for NEXUS format, read.tree for Newick format
 
 treelabel_A <- tree_A$tip.label
 treelabel_A <- sort(treelabel_A)
@@ -54,11 +54,11 @@ treeA_plot_new <- treeA_plot %<+% df_label_A +
   )
 treeA_plot_new
 
-ggsave(filename = "~/RSV/git/RSV Genetic Diversity/Europe/Treefiles/tree_rsvA_EU_annotated_country.pdf", width = 300, height = 1000, units = "cm", limitsize = FALSE)
+#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/Europe/Treefiles/tree_rsvA_EU_annotated_country.pdf", width = 300, height = 1000, units = "cm", limitsize = FALSE)
 
 # Tree visualization: RSV B
 
-tree_B <- read.tree("~/RSV/git/RSV Genetic Diversity/Europe/Treefiles/tree_rsvB_MAFFT_alignment_EU.treefile")
+tree_B <- read.tree("~/Yale_Projects/Genetic_Diversity_RSV/Europe/Treefiles/tree_rsvB_MAFFT_alignment_EU.treefile")
 
 treelabel_B <- tree_B$tip.label
 treelabel_B <- sort(treelabel_B)
@@ -95,4 +95,4 @@ treeB_plot_new <- treeB_plot %<+% df_label_B +
   ) 
 treeB_plot_new
 
-ggsave(filename = "~/RSV/git/RSV Genetic Diversity/Europe/Treefiles/tree_rsvB_EU_annotated_country_season_t.pdf", width = 300, height = 1000, units = "cm", limitsize = FALSE)
+#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/Europe/Treefiles/tree_rsvB_EU_annotated_country_season_t.pdf", width = 300, height = 1000, units = "cm", limitsize = FALSE)

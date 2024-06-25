@@ -9,19 +9,19 @@ library(MMWRweek)
 
 # Reference sequences
 
-RefSeq_rsvA <- read.csv("~/RSV/git/RSV Genetic Diversity/RefSeq/RefSeq_rsvA.csv")
-RefSeq_rsvB <- read.csv("~/RSV/git/RSV Genetic Diversity/RefSeq/RefSeq_rsvB.csv")
+RefSeq_rsvA <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/RefSeq/RefSeq_rsvA.csv")
+RefSeq_rsvB <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/RefSeq/RefSeq_rsvB.csv")
 
 ##################################################
 
 # German sequences 
 
 # Sequence information for NCBI WGS sequences starting from 2014/2015 season 
-rsvA <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/NCBI_rsvA_wgs_europe_2015.csv")
-rsvB <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/NCBI_rsvB_wgs_europe_2015.csv")
+rsvA <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/NCBI_rsvA_wgs_europe_2015.csv")
+rsvB <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/NCBI_rsvB_wgs_europe_2015.csv")
 
-rsvA_nextclade <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/nextclade_rsvA_EU.csv") #Nextclade output
-rsvB_nextclade <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/nextclade_rsvB_EU.csv")
+rsvA_nextclade <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/nextclade_rsvA_EU.csv") #Nextclade output
+rsvB_nextclade <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/nextclade_rsvB_EU.csv")
 
 # Reformat Dates
 rsvA$Collection_Date <- as.Date(rsvA$Collection_Date, format = "%Y-%m-%d") #%m/%d/%Y
@@ -73,17 +73,17 @@ rsvA_ref <- cbind(rsvA_ref, rsvA_clades)
 rsvB_ref <- cbind(rsvB_ref, rsvB_clades)
 
 # Export metadata
-'write.csv(rsvA_ref, file = "~/RSV/git/RSV Genetic Diversity/rsvA_ref_metadata.csv", row.names = FALSE)
-write.csv(rsvB_ref, file = "~/RSV/git/RSV Genetic Diversity/rsvB_ref_metadata.csv", row.names = FALSE)'
+#write.csv(rsvA_ref, file = "~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvA_ref_metadata.csv", row.names = FALSE)
+#write.csv(rsvB_ref, file = "~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvB_ref_metadata.csv", row.names = FALSE)
 
-write.csv(rsvAB, file = "~/RSV/git/RSV Genetic Diversity/Europe/rsvAB_metadata_EU.csv")
+#write.csv(rsvAB, file = "~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvAB_metadata_EU.csv")
 
 ##########################################################
 
 # European sequences
 
-rsvA_meta_EU <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/NCBI_rsvA_wgs_europe_2015.csv")
-rsvB_meta_EU <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/NCBI_rsvB_wgs_europe_2015.csv")
+rsvA_meta_EU <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/NCBI_rsvA_wgs_europe_2015.csv")
+rsvB_meta_EU <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/NCBI_rsvB_wgs_europe_2015.csv")
 
 rsvA_meta_EU$Collection_Date <- as.Date(rsvA_meta_EU$Collection_Date, format = "%Y-%m-%d") #WARNING: Format changes if opened in Excel before
 rsvB_meta_EU$Collection_Date <- as.Date(rsvB_meta_EU$Collection_Date, format = "%Y-%m-%d")
@@ -91,11 +91,11 @@ rsvB_meta_EU$Collection_Date <- as.Date(rsvB_meta_EU$Collection_Date, format = "
 #rsvA_meta_EU <- subset(rsvA_meta_EU, is.na(Collection_Date) == FALSE)
 #rsvB_meta_EU <- subset(rsvB_meta_EU, is.na(Collection_Date) == FALSE)
 
-#write.csv(rsvA_meta_EU, file = "~/RSV/git/RSV Genetic Diversity/Europe/NCBI_rsvA_wgs_europe_2015.csv", row.names = FALSE)
-#write.csv(rsvB_meta_EU, file = "~/RSV/git/RSV Genetic Diversity/Europe/NCBI_rsvB_wgs_europe_2015.csv", row.names = FALSE)
+#write.csv(rsvA_meta_EU, file = "~/Yale_Projects/Genetic_Diversity_RSV/Europe/NCBI_rsvA_wgs_europe_2015.csv", row.names = FALSE)
+#write.csv(rsvB_meta_EU, file = "~/Yale_Projects/Genetic_Diversity_RSV/Europe/NCBI_rsvB_wgs_europe_2015.csv", row.names = FALSE)
 
-rsvA_nextclade_EU <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/nextclade_rsvA_EU.csv")
-rsvB_nextclade_EU <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/nextclade_rsvB_EU.csv")
+rsvA_nextclade_EU <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/nextclade_rsvA_EU.csv")
+rsvB_nextclade_EU <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/nextclade_rsvB_EU.csv")
 
 # Generating metadata
 
@@ -134,8 +134,8 @@ rsvA_ref_meta_EU$G_clade <- rsvA_nextclade_EU$G_clade
 rsvB_ref_meta_EU$clade <- rsvB_nextclade_EU$clade
 rsvB_ref_meta_EU$G_clade <- rsvB_nextclade_EU$G_clade
 
-write.csv(rsvA_ref_meta_EU, file = "~/RSV/git/RSV Genetic Diversity/Europe/rsvA_ref_metadata_EU.csv", row.names = FALSE)
-write.csv(rsvB_ref_meta_EU, file = "~/RSV/git/RSV Genetic Diversity/Europe/rsvB_ref_metadata_EU.csv", row.names = FALSE)
+#write.csv(rsvA_ref_meta_EU, file = "~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvA_ref_metadata_EU.csv", row.names = FALSE)
+#write.csv(rsvB_ref_meta_EU, file = "~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvB_ref_metadata_EU.csv", row.names = FALSE)
 
 #Number of sequences for each country and season 
 
