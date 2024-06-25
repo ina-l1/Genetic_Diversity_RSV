@@ -44,13 +44,8 @@ meta_rsvB_EU <- subset(meta_rsvB, Country != "Germany"| Accession == RefSeq_rsvB
 ## SNP
 ### RSV A
 ####################
-<<<<<<< HEAD
 snpdist_rsvA_GER <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Germany/snpdist_rsvA.csv")
 snpdist_rsvA_EU <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/snpdist_rsvA_EU_noGer.csv")
-=======
-snpdist_rsvA_GER <- read.csv("~/RSV/git/RSV Genetic Diversity/Germany/snpdist_rsvA.csv")
-snpdist_rsvA_EU <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/snpdist_rsvA_EU_noGer.csv")
->>>>>>> 1fa746d66045b54a8b1d45f10ac5adb5322ea757
 
 snpdist_rsvA_GER <- arrange(snpdist_rsvA_GER, snpdist_rsvA_GER[,1])
 snpdist_rsvA_GER <- snpdist_rsvA_GER[,-1]
@@ -164,11 +159,7 @@ plot_snpdist_rsvB
 # End: 2023 W39
 # 2015 and 2020 have 53 instead of 53 weeks
 
-<<<<<<< HEAD
 snpdist_rsvA_EUGER <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/snpdist_rsvA_EU.csv")
-=======
-snpdist_rsvA_EUGER <- read.csv("~/RSV/git/RSV Genetic Diversity/Europe/snpdist_rsvA_EU.csv")
->>>>>>> 1fa746d66045b54a8b1d45f10ac5adb5322ea757
 
 snpdist_rsvA_EUGER <- arrange(snpdist_rsvA_EUGER, snpdist_rsvA_EUGER[,1])
 snpdist_rsvA_EUGER <- snpdist_rsvA_EUGER[,-1]
@@ -237,11 +228,7 @@ sliding_window_meta_rsvA_GER <- sliding_window_meta_rsvA %>% subset(Country == "
 sliding_window_meta_rsvA_EU <- sliding_window_meta_rsvA %>% subset(Country != "Germany") %>% rbind(RefA_df) %>% arrange(Accession)
 
 # SNP distance
-<<<<<<< HEAD
 snp_window <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Sliding Window/sliding_window_rsvA_assign.csv")
-=======
-snp_window <- read.csv("~/RSV/git/RSV Genetic Diversity/Sliding Window/sliding_window_rsvA_assign.csv")
->>>>>>> 1fa746d66045b54a8b1d45f10ac5adb5322ea757
 
 #meta_rsvA$Accession[which(snp_window$W172, TRUE)]
 #snpdist_rsvA_EU["LR699315.1", "LR699315.1"]
