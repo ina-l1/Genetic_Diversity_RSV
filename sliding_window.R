@@ -1,8 +1,13 @@
-# Genetic Distance over Time: Sliding Window
-# EU sequences
+# Sliding Window
+# GER vs. EU sequences
+
+# RSV-A and RSV-B
+# SNP, pairwise and Hamming distance
 
 library(dplyr)
 library(tidyr)
+library(stringr)
+library(tibble)
 library(ape)
 library(ggplot2)
 library(plotly)
@@ -13,25 +18,12 @@ library(MMWRweek)
 library(Rmisc)
 
 # Read metadata
+
 meta_rsvA <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvA_ref_metadata_EU.csv") #already in alphabetical order
 meta_rsvB <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvB_ref_metadata_EU.csv")
 
-# Read distance matrices 
-
-# Pairwise
-pairdist_rsvA <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/pairdist_rsvA_EU.csv")
-pairdist_rsvB <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/pairdist_rsvB_EU.csv")
-
-# SNP
-snpdist_rsvA <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/snpdist_rsvA_EU.csv")
-snpdist_rsvB <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/snpdist_rsvB_EU.csv")
-
-# Hamming 
-
-hamdist_rsvA <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/snpdist_rsvA_protein.csv")
-hamdist_rsvB <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/snpdist_rsvB_protein.csv")
-
-# Metadata: Add Year/Week for window
+meta_rsvA$Collection_Date <- as.Date(meta_rsvA$Collection_Date, format = "%Y-%m-%d") #%m/%d/%Y
+meta_rsvB$Collection_Date <- as.Date(meta_rsvB$Collection_Date, format = "%Y-%m-%d")
 
 meta_rsvA$Collection_YearWeek <- paste(meta_rsvA$MMWRyear, 
                                        ifelse(meta_rsvA$MMWRweek < 10, paste0("0", meta_rsvA$MMWRweek), meta_rsvA$MMWRweek), 
@@ -40,153 +32,234 @@ meta_rsvA$Collection_YearWeek <- paste(meta_rsvA$MMWRyear,
 meta_rsvB$Collection_YearWeek <- paste(meta_rsvB$MMWRyear, 
                                        ifelse(meta_rsvB$MMWRweek < 10, paste0("0", meta_rsvB$MMWRweek), meta_rsvB$MMWRweek), 
                                        sep = "/")
+RefSeq_rsvA <- "NC_038235.1"
+RefSeq_rsvB <- "NC_001781.1"
 
-# Sort row and col 
+## German sequences
+meta_rsvA_GER <- subset(meta_rsvA, Country == "Germany" | Accession == RefSeq_rsvA) #same as NCBI_rsvA_wgs_germany_2015.csv
+meta_rsvB_GER <- subset(meta_rsvB, Country == "Germany"| Accession == RefSeq_rsvB) #same as NCBI_rsvB_wgs_germany_2015.csv
 
-#Pairwise
-pairdist_rsvA <- arrange(pairdist_rsvA, pairdist_rsvA[,1])
-pairdist_rsvA <- pairdist_rsvA[,-1]
-pairdist_rsvA$Accession <- meta_rsvA$Accession #shorter name
-rownames(pairdist_rsvA) <- pairdist_rsvA$Accession
-pairdist_rsvA$Accession <- NULL
-pairdist_rsvA <- pairdist_rsvA %>% select(order(colnames(.)))
+## Non-German EU sequences
+meta_rsvA_EU <- subset(meta_rsvA, Country != "Germany"| Accession == RefSeq_rsvA)
+meta_rsvB_EU <- subset(meta_rsvB, Country != "Germany"| Accession == RefSeq_rsvB)
 
-pairdist_rsvB <- arrange(pairdist_rsvB, pairdist_rsvB[,1])
-pairdist_rsvB <- pairdist_rsvB[,-1]
-pairdist_rsvB$Accession <- meta_rsvB$Accession #shorter name
-rownames(pairdist_rsvB) <- pairdist_rsvB$Accession
-pairdist_rsvB$Accession <- NULL
-pairdist_rsvB <- pairdist_rsvB %>% select(order(colnames(.)))
+# Timetable (df) with weeks and years
 
-#SNP
-snpdist_rsvA <- arrange(snpdist_rsvA, snpdist_rsvA[,1])
-snpdist_rsvA <- snpdist_rsvA[,-1]
-snpdist_rsvA$Accession <- meta_rsvA$Accession #shorter name
-rownames(snpdist_rsvA) <- snpdist_rsvA$Accession
-snpdist_rsvA$Accession <- NULL
-snpdist_rsvA <- snpdist_rsvA %>% select(order(colnames(.)))
+# Start: 2014 W40
+# End: 2023 W39
+# 2015 and 2020 have 53 instead of 53 weeks
 
-snpdist_rsvB <- arrange(snpdist_rsvB, snpdist_rsvB[,1])
-snpdist_rsvB <- snpdist_rsvB[,-1]
-snpdist_rsvB$Accession <- meta_rsvB$Accession #shorter name
-rownames(snpdist_rsvB) <- snpdist_rsvB$Accession
-snpdist_rsvB$Accession <- NULL
-snpdist_rsvB <- snpdist_rsvB %>% select(order(colnames(.)))
+week <- rep(c(1:53), times = 10)
+year <- rep(c(2014:2023), each = 53)
+dates_df <- data.frame(year, week)
 
-#Hamming
-hamdist_rsvA <- arrange(hamdist_rsvA, hamdist_rsvA[,1])
-hamdist_rsvA <- hamdist_rsvA[,-1]
-hamdist_rsvA$Accession <- meta_rsvA$Accession #shorter name
-rownames(hamdist_rsvA) <- hamdist_rsvA$Accession
-hamdist_rsvA$Accession <- NULL
-hamdist_rsvA <- hamdist_rsvA %>% select(order(colnames(.)))
+vec <- which(dates_df$week == 53 & (dates_df$year != 2015 & dates_df$year!=2020)) #years with no 53rd week
+vec <- append(vec, which((between(dates_df$week, 1, 39) & dates_df$year == 2014)|(between(dates_df$week, 40, 53) & dates_df$year == 2023)))
 
-hamdist_rsvB <- arrange(hamdist_rsvB, hamdist_rsvB[,1])
-hamdist_rsvB <- hamdist_rsvB[,-1]
-hamdist_rsvB$Accession <- meta_rsvB$Accession #shorter name
-rownames(hamdist_rsvB) <- hamdist_rsvB$Accession
-hamdist_rsvB$Accession <- NULL
-hamdist_rsvB <- hamdist_rsvB %>% select(order(colnames(.)))
+dates_df <- dates_df[-vec,]
 
-# Distgroups
+dates_df$date <- decimal_date(MMWRweek2Date(dates_df$year, dates_df$week))
 
-#Pairwise    
-group_pairdist_rsvA <- dist_groups(pairdist_rsvA, meta_rsvA$Collection_YearWeek)
-within_pairdist_rsvA <- subset(group_pairdist_rsvA, Group1 == Group2)
+dates_df$index <- 1:nrow(dates_df)
+rownames(dates_df) <- dates_df$index
 
-group_pairdist_rsvB <- dist_groups(pairdist_rsvB, meta_rsvB$Collection_YearWeek)
-within_pairdist_rsvB <- subset(group_pairdist_rsvB, Group1 == Group2)
+# Determining window size and start/end date
 
-colnames(within_pairdist_rsvA)[1] <- "Accession"
-within_pairdist_rsvA$Year <- meta_rsvA$MMWRyear[match(within_pairdist_rsvA$Accession, meta_rsvA$Accession)] #SVERWEIS/VLOOKUP
-within_pairdist_rsvA$Week <- meta_rsvA$MMWRweek[match(within_pairdist_rsvA$Accession, meta_rsvA$Accession)]
-within_pairdist_rsvA$Date <- decimal_date(MMWRweek2Date(within_pairdist_rsvA$Year, within_pairdist_rsvA$Week))
+##'*SET WINDOW SIZE*
+sliding_window_size <- 8 
 
-colnames(within_pairdist_rsvB)[1] <- "Accession"
-within_pairdist_rsvB$Year <- meta_rsvB$MMWRyear[match(within_pairdist_rsvB$Accession, meta_rsvB$Accession)]
-within_pairdist_rsvB$Week <- meta_rsvB$MMWRweek[match(within_pairdist_rsvB$Accession, meta_rsvB$Accession)]
-within_pairdist_rsvB$Date <- decimal_date(MMWRweek2Date(within_pairdist_rsvB$Year, within_pairdist_rsvB$Week))
+sliding_window <- data.frame(matrix(ncol = 3))
+colnames(sliding_window) <- c("index","start_date","end_date")
+sliding_window <- sliding_window[-1,]
 
-stats_pairdist_rsvA <- summarySE(data = within_pairdist_rsvA, measurevar = "Distance", groupvars = "Date") #mean, standard deviation, standard error of the mean, and a (default 95%) confidence interval
-stats_pairdist_rsvB <- summarySE(data = within_pairdist_rsvB, measurevar = "Distance", groupvars = "Date")
+for(i in 1:(nrow(dates_df)-(sliding_window_size - 1))) { 
+  sliding_window[i,"index"] <- i
+  sliding_window[i,"start_date"] <- dates_df$date[i]
+  sliding_window[i,"end_date"] <- dates_df$date[i+(sliding_window_size - 1)]
+}
 
-#SNP
-group_snpdist_rsvA <- dist_groups(snpdist_rsvA, meta_rsvA$Collection_YearWeek)
-within_snpdist_rsvA <- subset(group_snpdist_rsvA, Group1 == Group2)
+# Distance matrix 
 
-group_snpdist_rsvB <- dist_groups(snpdist_rsvB, meta_rsvB$Collection_YearWeek)
-within_snpdist_rsvB <- subset(group_snpdist_rsvB, Group1 == Group2)
+# RSV-A and RSV-B: Replace rsvA/rsvB
+# Diversity Measures: Replace snpdist/pairdist/hamdist
 
-colnames(within_snpdist_rsvA)[1] <- "Accession"
-within_snpdist_rsvA$Year <- meta_rsvA$MMWRyear[match(within_snpdist_rsvA$Accession, meta_rsvA$Accession)]
-within_snpdist_rsvA$Week <- meta_rsvA$MMWRweek[match(within_snpdist_rsvA$Accession, meta_rsvA$Accession)]
-within_snpdist_rsvA$Date <- decimal_date(MMWRweek2Date(within_snpdist_rsvA$Year, within_snpdist_rsvA$Week))
+dist_rsvB_GER <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Germany/pairdist_rsvB.csv")
+dist_rsvB_EU <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/pairdist_rsvB_EU_noGer.csv")
 
-colnames(within_snpdist_rsvB)[1] <- "Accession"
-within_snpdist_rsvB$Year <- meta_rsvB$MMWRyear[match(within_snpdist_rsvB$Accession, meta_rsvB$Accession)]
-within_snpdist_rsvB$Week <- meta_rsvB$MMWRweek[match(within_snpdist_rsvB$Accession, meta_rsvB$Accession)]
-within_snpdist_rsvB$Date <- decimal_date(MMWRweek2Date(within_snpdist_rsvB$Year, within_snpdist_rsvB$Week))
+dist_rsvB_GER <- arrange(dist_rsvB_GER, dist_rsvB_GER[,1])
+dist_rsvB_GER <- dist_rsvB_GER[,-1]
+rownames(dist_rsvB_GER) <- meta_rsvB_GER$Accession
+dist_rsvB_GER <- dist_rsvB_GER %>% select(order(colnames(.)))
+colnames(dist_rsvB_GER) <- meta_rsvB_GER$Accession
 
-stats_snpdist_rsvA <- summarySE(data = within_snpdist_rsvA, measurevar = "Distance", groupvars = "Date") #mean, standard deviation, standard error of the mean, and a (default 95%) confidence interval
-stats_snpdist_rsvB <- summarySE(data = within_snpdist_rsvB, measurevar = "Distance", groupvars = "Date")
+dist_rsvB_EU <- arrange(dist_rsvB_EU, dist_rsvB_EU[,1])
+dist_rsvB_EU <- dist_rsvB_EU[,-1]
+rownames(dist_rsvB_EU) <- meta_rsvB_EU$Accession
+dist_rsvB_EU <- dist_rsvB_EU %>% select(order(colnames(.)))
+colnames(dist_rsvB_EU) <- meta_rsvB_EU$Accession
 
-#Ham
-group_hamdist_rsvA <- dist_groups(hamdist_rsvA, meta_rsvA$Collection_YearWeek)
-within_hamdist_rsvA <- subset(group_hamdist_rsvA, Group1 == Group2)
+# Distances
 
-group_hamdist_rsvB <- dist_groups(hamdist_rsvB, meta_rsvB$Collection_YearWeek)
-within_hamdist_rsvB <- subset(group_hamdist_rsvB, Group1 == Group2)
+## GER
+dist_mean_GER <- data.frame("window" =  1:nrow(sliding_window), "num" = 0, "dist_mean" = 0, "dist_std" = 0, "start_date" = sliding_window$start_date)
+violin_rsvB_GER_df <- data.frame(matrix(ncol = 3, nrow = 0))
 
-colnames(within_hamdist_rsvA)[1] <- "Accession"
-within_hamdist_rsvA$Year <- meta_rsvA$MMWRyear[match(within_hamdist_rsvA$Accession, meta_rsvA$Accession)]
-within_hamdist_rsvA$Week <- meta_rsvA$MMWRweek[match(within_hamdist_rsvA$Accession, meta_rsvA$Accession)]
-within_hamdist_rsvA$Date <- decimal_date(MMWRweek2Date(within_hamdist_rsvA$Year, within_hamdist_rsvA$Week))
+for(window_index in 1:nrow(sliding_window)) {
+  dist_sum <- 0
+  dist_vec <- c()
+  acc_list <- c()
+  
+  for(acc_index0 in 1:nrow(meta_rsvB_GER)) {
+    if(meta_rsvB_GER$Accession[acc_index0] != RefSeq_rsvB & 
+       decimal_date(meta_rsvB_GER$Collection_Date[acc_index0]) >= sliding_window[window_index, "start_date"] & 
+       decimal_date(meta_rsvB_GER$Collection_Date[acc_index0]) <= sliding_window[window_index, "end_date"]) {
+      acc_list <- append(acc_list, meta_rsvB_GER$Accession[acc_index0])
+    }
+  }
+  print(window_index)
+  print(acc_list)
+  
+  acc_length <- length(acc_list)
+  if(acc_length <= 1) {
+    dist_mean_GER[window_index, "dist_mean"] <- NA
+  } else {
+    for(acc_index1 in 1:acc_length) {
+      for(acc_index2 in acc_index1:acc_length) {
+        dist_sum <- dist_rsvB_GER[acc_list[acc_index1], 
+                                      acc_list[acc_index2]] + dist_sum
+        if(acc_index1 != acc_index2)  {
+          dist_vec <- append(dist_vec, dist_rsvB_GER[acc_list[acc_index1], acc_list[acc_index2]])
+        }
+      }
+    }
+    print(dist_vec)
+    temp_df <- data.frame(matrix(ncol = 3, nrow = length(dist_vec)))
+    temp_df[,1] <- window_index
+    temp_df[,2] <- sliding_window[window_index, "start_date"]
+    temp_df[,3] <- dist_vec
+    
+    violin_rsvB_GER_df <- rbind(violin_rsvB_GER_df, temp_df)
+    
+    number_pairwise_dist <- (acc_length*(acc_length-1))/2
+    mean <- dist_sum/number_pairwise_dist
+    dist_mean_GER[window_index, "dist_mean"] <- mean
+    
+    dist_mean_GER[window_index, "dist_std"] <- sd(unlist(dist_vec))
+    dist_mean_GER[window_index, "num"] <- acc_length
+  }
+}
 
-colnames(within_hamdist_rsvB)[1] <- "Accession"
-within_hamdist_rsvB$Year <- meta_rsvB$MMWRyear[match(within_hamdist_rsvB$Accession, meta_rsvB$Accession)]
-within_hamdist_rsvB$Week <- meta_rsvB$MMWRweek[match(within_hamdist_rsvB$Accession, meta_rsvB$Accession)]
-within_hamdist_rsvB$Date <- decimal_date(MMWRweek2Date(within_hamdist_rsvB$Year, within_hamdist_rsvB$Week))
+colnames(violin_rsvB_GER_df) <- c("window", "start_date", "dist")
 
-stats_hamdist_rsvA <- summarySE(data = within_hamdist_rsvA, measurevar = "Distance", groupvars = "Date") #mean, standard deviation, standard error of the mean, and a (default 95%) confidence interval
-stats_hamdist_rsvB <- summarySE(data = within_hamdist_rsvB, measurevar = "Distance", groupvars = "Date")
+'ggplot(dist_mean_GER, aes(x = start_date, y = dist_mean)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = dist_mean-dist_std, ymax = dist_mean+dist_std))
 
-# Plot
+ggplot(violin_rsvB_GER_df, aes(x = as.factor(start_date), y = dist, colour = "red")) +
+  geom_violin()'
 
-#Pairwise
-ggplot(stats_pairdist_rsvA, aes(x = Date, y = Distance)) +
-  geom_errorbar(aes(ymin = Distance-se, ymax = Distance+se)) +
-  geom_point()
+## EU
+dist_mean_EU <- data.frame("window" =  1:nrow(sliding_window), "num" = 0, "dist_mean" = 0, "dist_std" = 0, "start_date" = sliding_window$start_date)
+violin_rsvB_EU_df <- data.frame(matrix(ncol = 3, nrow = 0))
 
-#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/Plots/weekly_rsvA_pair_EU.png", width = 50, height = 20, units = "cm", limitsize = FALSE)
+for(window_index in 1:nrow(sliding_window)) {
+  dist_sum <- 0
+  dist_vec <- c()
+  acc_list <- c()
+  for(acc_index0 in 1:nrow(meta_rsvB_EU)) {
+    if(meta_rsvB_EU$Accession[acc_index0] != RefSeq_rsvB & 
+       decimal_date(meta_rsvB_EU$Collection_Date[acc_index0]) >= sliding_window[window_index, "start_date"] & 
+       decimal_date(meta_rsvB_EU$Collection_Date[acc_index0]) <= sliding_window[window_index, "end_date"]) {
+      acc_list <- append(acc_list, meta_rsvB_EU$Accession[acc_index0])
+    }
+  }
+  print(window_index)
+  print(acc_list)
+  
+  acc_length <- length(acc_list)
+  if(acc_length <= 1) {
+    dist_mean_EU[window_index, "dist_mean"] <- NA
+  } else {
+    for(acc_index1 in 1:acc_length) {
+      for(acc_index2 in acc_index1:acc_length) {
+        dist_sum <- dist_rsvB_EU[acc_list[acc_index1], 
+                                    acc_list[acc_index2]] + dist_sum
+        if(acc_index1 != acc_index2)  { #dist_rsvB_EU[acc_list[acc_index1], acc_list[acc_index2]] != 0
+          dist_vec <- append(dist_vec, dist_rsvB_EU[acc_list[acc_index1], acc_list[acc_index2]])
+        }
+      }
+    }
+    number_pairwise_dist <- (acc_length*(acc_length-1))/2
+    mean <- dist_sum/number_pairwise_dist
+    dist_mean_EU[window_index, "dist_mean"] <- mean
+    
+    print(dist_vec)
+    
+    temp_df <- data.frame(matrix(ncol = 3, nrow = length(dist_vec)))
+    temp_df[,1] <- window_index
+    temp_df[,2] <- sliding_window[window_index, "start_date"]
+    temp_df[,3] <- dist_vec
+    
+    violin_rsvB_EU_df <- rbind(violin_rsvB_EU_df, temp_df)
+    
+    dist_mean_EU[window_index, "dist_std"] <- sd(unlist(dist_vec))
+    #sqrt(sum(unlist(lapply(dist_vec, function(x) (x - mean)**2)))/(number_pairwise_dist))
+    dist_mean_EU[window_index, "num"] <- acc_length
+  }
+}
 
-ggplot(stats_pairdist_rsvB, aes(x = Date, y = Distance)) +
-  geom_errorbar(aes(ymin = Distance-se, ymax = Distance+se)) +
-  geom_point()
+colnames(violin_rsvB_EU_df) <- c("window", "start_date", "dist")
 
-#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/weekly_rsvB_pair_EU.png", width = 50, height = 20, units = "cm", limitsize = FALSE)
+'ggplot(dist_mean_EU, aes(x = start_date, y = dist_mean)) + 
+  geom_point() +
+  geom_errorbar(aes(ymin = dist_mean-dist_std, ymax = dist_mean+dist_std))
 
-#SNP
-ggplot(stats_snpdist_rsvA, aes(x = Date, y = Distance)) +
-  geom_errorbar(aes(ymin = Distance-se, ymax = Distance+se)) +
-  geom_point()
+ggplot(violin_rsvB_EU_df, aes(x = as.factor(window), y = dist)) +
+  geom_violin()'
 
-#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/weekly_rsvA_snp_EU.png", width = 50, height = 20, units = "cm", limitsize = FALSE)
+# Plot EU + GER
 
-ggplot(stats_snpdist_rsvB, aes(x = Date, y = Distance)) +
-  geom_errorbar(aes(ymin = Distance-se, ymax = Distance+se)) +
-  geom_point()
+sliding_window_plot <- ggplot(dist_mean_GER, aes(x = start_date, y = dist_mean)) +
+  geom_errorbar(data = dist_mean_EU, aes(ymin = dist_mean-dist_std, ymax = dist_mean+dist_std), colour = "grey") +
+  geom_errorbar(aes(ymin = dist_mean-dist_std, ymax = dist_mean+dist_std), colour = "black", alpha = 0.45) +
+  geom_point(colour = "red") +
+  geom_point(data = dist_mean_EU, aes(x = start_date, y = dist_mean), colour = "blue")
+sliding_window_plot
 
-#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/weekly_rsvB_snp_EU.png", width = 50, height = 20, units = "cm", limitsize = FALSE)
+ggplot(violin_rsvB_EU_df, aes(x = factor(window), y = dist)) +
+  geom_violin(colour = "blue", alpha = 0.5) +
+  scale_x_discrete(guide = guide_axis(check.overlap = TRUE)) +
+  geom_violin(data = violin_rsvB_EU_df, aes(x = factor(window), y = dist), colour = "red", alpha = 0.5)
 
-#Hamming
-ggplot(stats_hamdist_rsvA, aes(x = Date, y = Distance)) +
-  geom_errorbar(aes(ymin = Distance-se, ymax = Distance+se)) +
-  geom_point()
+#########################################
+'# Assign window to collection date
+sliding_window_meta_rsvB <- subset(meta_rsvB, Accession != RefSeq_rsvB)
+sliding_window_meta_rsvB <- sliding_window_meta_rsvB[, c("Accession", "Country", "Collection_Date")]
+sliding_window_meta_rsvB$Collection_Date_dec <- decimal_date(sliding_window_meta_rsvB$Collection_Date)
 
-#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/weekly_rsvA_ham_EU.png", width = 50, height = 20, units = "cm", limitsize = FALSE)
+sliding_windows_index <- list()
+for(j in 1:(nrow(sliding_window_meta_rsvB))) {
+  sliding_windows_index[j] <- list(which(sliding_window_meta_rsvB$Collection_Date_dec[j] >= sliding_window$start_date & 
+                                           sliding_window_meta_rsvB$Collection_Date_dec[j] <= sliding_window$end_date))
+}
 
-ggplot(stats_hamdist_rsvB, aes(x = Date, y = Distance)) +
-  geom_errorbar(aes(ymin = Distance-se, ymax = Distance+se)) +
-  geom_point()
+for(n in 1:length(sliding_windows_index)) {
+  for(m in 1:length(sliding_windows_index[[n]])) {
+    sliding_windows_index[[n]][m] <- ifelse(as.integer(sliding_windows_index[[n]][m]) < 100, ifelse(as.integer(sliding_windows_index[[n]][m]) < 10, paste0(00, sliding_windows_index[[n]][m]), paste0(0, sliding_windows_index[[n]][m])), as.character(sliding_windows_index[[n]][m]))
+  }
+}
 
-#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/weekly_rsvB_ham_EU.png", width = 50, height = 20, units = "cm", limitsize = FALSE)
+for(l in 1:(nrow(sliding_window_meta_rsvB))) {
+  window_temp <- ""
+  for(k in 1:length(sliding_windows_index[[l]])) {
+    window_temp <- paste(window_temp, sliding_windows_index[[l]][k], sep = "W")
+  }
+  sliding_window_meta_rsvB$Window[l] <- window_temp
+}
+
+RefA_df <- data.frame("Accession" = RefSeq_rsvB, "Country" = NA, "Collection_Date" = NA, 
+                      "Collection_Date_dec" = NA, "Window" = NA,
+                      stringsAsFactors = FALSE)
+
+sliding_window_meta_rsvB_GER <- sliding_window_meta_rsvB %>% subset(Country == "Germany") %>% rbind(RefA_df) %>% arrange(Accession)
+sliding_window_meta_rsvB_EU <- sliding_window_meta_rsvB %>% subset(Country != "Germany") %>% rbind(RefA_df) %>% arrange(Accession)'
