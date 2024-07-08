@@ -65,7 +65,7 @@ rownames(dates_df) <- dates_df$index
 
 # Determining window size and start/end date
 
-##'*SET WINDOW SIZE*
+##'*SET WINDOW SIZE (weeks)*
 sliding_window_size <- 8 
 
 sliding_window <- data.frame(matrix(ncol = 3))
@@ -83,8 +83,8 @@ for(i in 1:(nrow(dates_df)-(sliding_window_size - 1))) {
 # RSV-A and RSV-B: Replace rsvA/rsvB
 # Diversity Measures: Replace snpdist/pairdist/hamdist
 
-dist_rsvB_GER <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Germany/pairdist_rsvB.csv")
-dist_rsvB_EU <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/pairdist_rsvB_EU_noGer.csv")
+dist_rsvB_GER <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Germany/snpdist_rsvB.csv")
+dist_rsvB_EU <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/snpdist_rsvB_EU_noGer.csv")
 
 dist_rsvB_GER <- arrange(dist_rsvB_GER, dist_rsvB_GER[,1])
 dist_rsvB_GER <- dist_rsvB_GER[,-1]
@@ -209,7 +209,7 @@ for(window_index in 1:nrow(sliding_window)) {
 }
 
 colnames(violin_rsvB_EU_df) <- c("window", "start_date", "dist")
-
+  
 'ggplot(dist_mean_EU, aes(x = start_date, y = dist_mean)) + 
   geom_point() +
   geom_errorbar(aes(ymin = dist_mean-dist_std, ymax = dist_mean+dist_std))
@@ -226,10 +226,22 @@ sliding_window_plot <- ggplot(dist_mean_GER, aes(x = start_date, y = dist_mean))
   geom_point(data = dist_mean_EU, aes(x = start_date, y = dist_mean), colour = "blue")
 sliding_window_plot
 
-ggplot(violin_rsvB_EU_df, aes(x = factor(window), y = dist)) +
-  geom_violin(colour = "blue", alpha = 0.5) +
-  scale_x_discrete(guide = guide_axis(check.overlap = TRUE)) +
-  geom_violin(data = violin_rsvB_EU_df, aes(x = factor(window), y = dist), colour = "red", alpha = 0.5)
+# Violin Plot
+
+violin_rsvB_GER_df$'EU/GER' <- "GER"
+violin_rsvB_EU_df$'EU/GER' <- "EU"
+
+violin_GER_EU_df <- rbind(violin_rsvB_GER_df, violin_rsvB_EU_df)
+violin_GER_EU_df <- arrange(violin_GER_EU_df, window)
+
+violin_rsvB_df <- data.frame("window" = sliding_window$index)
+violin_rsvB_df <- full_join(violin_rsvB_df, violin_GER_EU_df, by = "window")
+
+ggplot(violin_rsvB_df, aes(x = factor(window), y = dist, fill = `EU/GER`, colour = `EU/GER`)) +
+  geom_violin() +
+  scale_colour_manual(values = c("GER" = "red", "EU" = "blue")) +
+  scale_fill_manual(values = c("GER" = "red", "EU" = "blue")) +
+  scale_x_discrete(guide = guide_axis(check.overlap = TRUE))
 
 #########################################
 '# Assign window to collection date
