@@ -25,24 +25,28 @@ RefSeq_rsvB <- "NC_001781.1"
 #aln_shannon_rsvA <- read.fasta("~/Yale_Projects/Genetic_Diversity_RSV/Sequences/rsvA_MAFFT_alignment.fasta")
  
 # Filter important metadata
-meta_rsvA[which(meta_rsvA$Accession == RefSeq_rsvA), "Collection_Season"] <- "Ref"
-meta_rsvA_short <- subset(meta_rsvA, select = c("Accession", "Type", "Collection_Date", "Collection_Season", "MMWRyear", "MMWRweek", "Country"))
-meta_rsvA_short$plotlabel <- paste(meta_rsvA_short$Accession, meta_rsvA_short$Type, meta_rsvA_short$Collection_Season, meta_rsvA_short$Collection_Month, sep = "_")
+meta_rsvA$'EU/GER' <- ifelse(meta_rsvA$Country == "Germany", "GER", "EU")
+meta_rsvA[which(meta_rsvA$Accession == RefSeq_rsvA), c("Collection_Season", "EU/GER", "Country")] <- "Ref"
 
-meta_rsvB[which(meta_rsvB$Accession == RefSeq_rsvB), "Collection_Season"] <- "Ref"
-meta_rsvB_short <- subset(meta_rsvB, select = c("Accession", "Type", "Collection_Date", "Collection_Season", "MMWRyear", "MMWRweek", "Country"))
-meta_rsvB_short$plotlabel <- paste(meta_rsvB_short$Accession, meta_rsvB_short$Type, meta_rsvB_short$Collection_Season, meta_rsvB_short$Collection_Month, sep = "_")
+meta_rsvA_short <- subset(meta_rsvA, select = c("Accession", "Type", "Collection_Date", "Collection_Season", "MMWRyear", "MMWRweek", "Country", "EU/GER"))
+meta_rsvA_short$plotlabel <- paste(meta_rsvA_short$Accession, meta_rsvA_short$Collection_Season, meta_rsvA_short$MMWRweek, meta_rsvA_short$Country, sep = "_")
+
+meta_rsvB$'EU/GER' <- ifelse(meta_rsvB$Country == "Germany", "GER", "EU")
+meta_rsvB[which(meta_rsvB$Accession == RefSeq_rsvB), c("Collection_Season", "EU/GER", "Country")] <- "Ref"
+
+meta_rsvB_short <- subset(meta_rsvB, select = c("Accession", "Type", "Collection_Date", "Collection_Season", "MMWRyear", "MMWRweek", "Country", "EU/GER"))
+meta_rsvB_short$plotlabel <- paste(meta_rsvB_short$Accession, meta_rsvB_short$Collection_Season, meta_rsvB_short$MMWRweek, meta_rsvB_short$Country, sep = "_")
 
 # Pairwise Distances from DNA Sequences
 
 # Maybe use dist() for euclidian distance
-dist_rsvA <- dist.dna(aln_rsvA, model = "K80", #evolutionary model 
+dist_rsvA <- dist.dna(aln_rsvA, model = "K81", #evolutionary model 
                       variance = FALSE, #compute variances of distances
                       gamma = FALSE, #correction of distances
                       pairwise.deletion = FALSE, #delete sites with missing data
                       as.matrix = TRUE) #return results as matrix or object of class dist
 
-dist_rsvB <- dist.dna(aln_rsvB, model = "K80", 
+dist_rsvB <- dist.dna(aln_rsvB, model = "K81", 
                       variance = FALSE, 
                       gamma = FALSE,
                       pairwise.deletion = FALSE,
@@ -88,16 +92,25 @@ shannon_plot'
 # Classic multidimensional scaling (MDS)
 
 # Pairwise distance
-mds_rsvA <- cmdscale(dist_rsvA, k = 2) #k dim
-mds_rsvB <- cmdscale(dist_rsvB, k = 2)
+mds_pair_rsvA_eig <- cmdscale(dist_rsvA, k = 2, eig = TRUE) #k dim
+mds_rsvA <- as.data.frame(mds_pair_rsvA_eig[1])
+
+mds_pair_rsvB_eig <- cmdscale(dist_rsvB, k = 2, eig = TRUE)
+mds_rsvB <- as.data.frame(mds_pair_rsvB_eig[1])
 
 # SNP distance
-mds_snp_rsvA <- cmdscale(snp_dist_rsvA, k = 2)
-mds_snp_rsvB <- cmdscale(snp_dist_rsvB, k = 2)
+mds_snp_rsvA_eig <- cmdscale(snp_dist_rsvA, k = 2, eig = TRUE)
+mds_snp_rsvA <- as.data.frame(mds_snp_rsvA_eig[1])
+
+mds_snp_rsvB_eig <- cmdscale(snp_dist_rsvB, k = 2, eig = TRUE)
+mds_snp_rsvB <- as.data.frame(mds_snp_rsvB_eig[1])
 
 # Hamming distance
-mds_ham_rsvA <- cmdscale(ham_dist_rsvA, k = 2)
-mds_ham_rsvB <- cmdscale(ham_dist_rsvB, k = 2)
+mds_ham_rsvA_eig <- cmdscale(ham_dist_rsvA, k = 2, eig = TRUE)
+mds_ham_rsvA <- as.data.frame(mds_ham_rsvA_eig[1])
+
+mds_ham_rsvB_eig <- cmdscale(ham_dist_rsvB, k = 2, eig = TRUE)
+mds_ham_rsvB <- as.data.frame(mds_ham_rsvB_eig[1])
 
 # Plot MDS
 
@@ -119,7 +132,6 @@ y_mds_snp_rsvA <- mds_snp_rsvA[, 2]
 plot_mds_snp_rsvA <- plot(x_mds_snp_rsvA, y_mds_snp_rsvA)
 
 x_mds_snp_rsvB <- mds_snp_rsvB[, 1]
-
 y_mds_snp_rsvB <- mds_snp_rsvB[, 2]
 
 plot_mds_snp_rsvB <- plot(x_mds_snp_rsvB, y_mds_snp_rsvB)
@@ -135,11 +147,55 @@ y_mds_ham_rsvB <- mds_ham_rsvB[, 2]
 
 plot_mds_ham_rsvB <- plot(x_mds_ham_rsvB, y_mds_ham_rsvB)
 
+# Calculate proportion of variance explained through MDS
+
+## Pairwise distance
+eigenvalues_pair <- mds_pair_rsvA_eig$eig
+total_variance_pair <- sum(eigenvalues_pair[eigenvalues_pair > 0])
+variance_explained_dim1_pair <- eigenvalues_pair[1] / total_variance_pair
+variance_explained_dim2_pair <- eigenvalues_pair[2] / total_variance_pair
+# Combined variance explained by the two dimensions
+combined_variance_explained_pair <- variance_explained_dim1_pair + variance_explained_dim2_pair
+combined_variance_explained_pair
+
+eigenvalues_pair <- mds_pair_rsvB_eig$eig
+total_variance_pair <- sum(eigenvalues_pair[eigenvalues_pair > 0])
+variance_explained_dim1_pair <- eigenvalues_pair[1] / total_variance_pair
+variance_explained_dim2_pair <- eigenvalues_pair[2] / total_variance_pair
+# Combined variance explained by the two dimensions
+combined_variance_explained_pair <- variance_explained_dim1_pair + variance_explained_dim2_pair
+combined_variance_explained_pair
+
+## SNP distance
+eigenvalues_snp <- mds_snp_rsvA_eig$eig
+total_variance_snp <- sum(eigenvalues_snp[eigenvalues_snp > 0])
+variance_explained_dim1_snp <- eigenvalues_snp[1] / total_variance_snp
+variance_explained_dim2_snp <- eigenvalues_snp[2] / total_variance_snp
+# Combined variance explained by the two dimensions
+combined_variance_explained_snp <- variance_explained_dim1_snp + variance_explained_dim2_snp
+combined_variance_explained_snp
+
+eigenvalues_snp <- mds_snp_rsvB_eig$eig
+total_variance_snp <- sum(eigenvalues_snp[eigenvalues_snp > 0])
+variance_explained_dim1_snp <- eigenvalues_snp[1] / total_variance_snp
+variance_explained_dim2_snp <- eigenvalues_snp[2] / total_variance_snp
+# Combined variance explained by the two dimensions
+combined_variance_explained_snp <- variance_explained_dim1_snp + variance_explained_dim2_snp
+combined_variance_explained_snp
+
+## Hamming distance
+eigenvalues_ham <- mds_ham_rsvA_eig$eig
+total_variance_ham <- sum(eigenvalues_ham[eigenvalues_ham > 0])
+variance_explained_dim1_ham <- eigenvalues_ham[1] / total_variance_ham
+variance_explained_dim2_ham <- eigenvalues_ham[2] / total_variance_ham
+# Combined variance explained by the two dimensions
+combined_variance_explained_ham <- variance_explained_dim1_ham + variance_explained_dim2_ham
+
 # Plot MDS with labels 
 
 # PAIRWISE: Create df with labels
 df_mds_rsvA <- data.frame(x_axis = x_mds_rsvA, y_axis = y_mds_rsvA)
-df_mds_rsvA$ID <- rownames(df_mds_rsvA)
+df_mds_rsvA$ID <- as.numeric(rownames(df_mds_rsvA))
 df_mds_rsvA <- relocate(df_mds_rsvA, ID)
 rownames(df_mds_rsvA) <- c(1:nrow(df_mds_rsvA))
 df_mds_rsvA <- arrange(df_mds_rsvA, ID)
@@ -147,7 +203,7 @@ df_mds_rsvA <- arrange(df_mds_rsvA, ID)
 mds_meta_rsvA <- cbind(meta_rsvA_short, df_mds_rsvA)
 
 df_mds_rsvB <- data.frame(x_axis = x_mds_rsvB, y_axis = y_mds_rsvB)
-df_mds_rsvB$ID <- rownames(df_mds_rsvB)
+df_mds_rsvB$ID <- as.numeric(rownames(df_mds_rsvB))
 df_mds_rsvB <- relocate(df_mds_rsvB, ID)
 rownames(df_mds_rsvB) <- c(1:nrow(df_mds_rsvB))
 df_mds_rsvB <- arrange(df_mds_rsvB, ID)
@@ -156,7 +212,7 @@ mds_meta_rsvB <- cbind(meta_rsvB_short, df_mds_rsvB)
 
 # SNP: Create df with labels
 df_mds_snp_rsvA <- data.frame(x_axis = x_mds_snp_rsvA, y_axis = y_mds_snp_rsvA)
-df_mds_snp_rsvA$ID <- rownames(df_mds_snp_rsvA)
+df_mds_snp_rsvA$ID <- as.numeric(rownames(df_mds_snp_rsvA))
 df_mds_snp_rsvA <- relocate(df_mds_snp_rsvA, ID)
 rownames(df_mds_snp_rsvA) <- c(1:nrow(df_mds_snp_rsvA))
 df_mds_snp_rsvA <- arrange(df_mds_snp_rsvA, ID)
@@ -164,8 +220,8 @@ df_mds_snp_rsvA <- arrange(df_mds_snp_rsvA, ID)
 mds_snp_meta_rsvA <- cbind(meta_rsvA_short, df_mds_snp_rsvA)
 
 df_mds_snp_rsvB <- data.frame(x_axis = x_mds_snp_rsvB, y_axis = y_mds_snp_rsvB)
-df_mds_snp_rsvB$ID <- rownames(df_mds_snp_rsvB)
-df_mds_snp_rsvB <- relocate(df_mds_rsvB, ID)
+df_mds_snp_rsvB$ID <- as.numeric(rownames(df_mds_snp_rsvB))
+df_mds_snp_rsvB <- relocate(df_mds_snp_rsvB, ID)
 rownames(df_mds_snp_rsvB) <- c(1:nrow(df_mds_snp_rsvB))
 df_mds_snp_rsvB <- arrange(df_mds_snp_rsvB, ID)
 
@@ -173,7 +229,7 @@ mds_snp_meta_rsvB <- cbind(meta_rsvB_short, df_mds_snp_rsvB)
 
 # Hamming: Create df with labels
 df_mds_ham_rsvA <- data.frame(x_axis = x_mds_ham_rsvA, y_axis = y_mds_ham_rsvA)
-df_mds_ham_rsvA$ID <- rownames(df_mds_ham_rsvA)
+df_mds_ham_rsvA$ID <- as.numeric(rownames(df_mds_ham_rsvA))
 df_mds_ham_rsvA <- relocate(df_mds_ham_rsvA, ID)
 rownames(df_mds_ham_rsvA) <- c(1:nrow(df_mds_ham_rsvA))
 df_mds_ham_rsvA <- arrange(df_mds_ham_rsvA, ID)
@@ -181,7 +237,7 @@ df_mds_ham_rsvA <- arrange(df_mds_ham_rsvA, ID)
 mds_ham_meta_rsvA <- cbind(meta_rsvA_short, df_mds_ham_rsvA)
 
 df_mds_ham_rsvB <- data.frame(x_axis = x_mds_ham_rsvB, y_axis = y_mds_ham_rsvB)
-df_mds_ham_rsvB$ID <- rownames(df_mds_ham_rsvB)
+df_mds_ham_rsvB$ID <- as.numeric(rownames(df_mds_ham_rsvB))
 df_mds_ham_rsvB <- relocate(df_mds_ham_rsvB, ID)
 rownames(df_mds_ham_rsvB) <- c(1:nrow(df_mds_ham_rsvB))
 df_mds_ham_rsvB <- arrange(df_mds_ham_rsvB, ID)
@@ -191,30 +247,42 @@ mds_ham_meta_rsvB <- cbind(meta_rsvB_short, df_mds_ham_rsvB)
 # MDS Plots
 
 # Pairwise distance
-plot_rsvA_mds_label <- ggplot(mds_meta_rsvA, aes(x = x_axis, y = y_axis, color = Country)) + #color = Collection_Season
-  geom_point() +
-  geom_text(
-    label = paste(mds_meta_rsvA$Collection_Season, mds_meta_rsvA$MMWRweek, sep = "_"),
-    check_overlap = TRUE
-  ) 
-plot_rsvA_mds_label
 
-plot_rsvB_mds_label <- ggplot(mds_meta_rsvB, aes(x = x_axis, y = y_axis, color = Collection_Season)) +
+plot_rsvB_mds_label <- ggplot(mds_meta_rsvB, aes(x = x_axis, y = y_axis, color = Country)) + #color = Country
+  geom_point() +
+  theme_minimal()
+plot_rsvB_mds_label
+
+plot_rsvB_mds_label <- ggplot(mds_meta_rsvB, aes(x = x_axis, y = y_axis, color = `EU/GER`)) + #color = Collection_Season
+  geom_point() +
+  scale_color_manual(values = c("GER" = "red", "EU" =  "blue", "Ref" = "green")) +
+  scale_fill_manual(values = c("GER" = "red", "EU" =  "blue", "Ref" = "green")) + 
+  theme_minimal()
+plot_rsvB_mds_label
+
+plot_rsvB_mds_label <- ggplot(mds_meta_rsvB, aes(x = x_axis, y = y_axis, color = `EU/GER`)) + #color = Collection_Season
   geom_point() +
   geom_text(
-    label = paste(mds_meta_rsvB$Collection_Season, mds_meta_rsvB$MMWRweek, sep = "_"),
+    label = mds_meta_rsvB$plotlabel,
     check_overlap = TRUE
-  )
+  ) +
+  scale_color_manual(values = c("GER" = "red", "EU" =  "blue", "Ref" = "green")) +
+  scale_fill_manual(values = c("GER" = "red", "EU" =  "blue", "Ref" = "green")) +
+  theme_minimal()
 plot_rsvB_mds_label
 
 # SNP distance
-plot_rsvA_mds_snp_label <- ggplot(mds_snp_meta_rsvA, aes(x = x_axis, y = y_axis, color = Collection_Season)) +
+plot_rsvB_mds_snp_label <- ggplot(mds_snp_meta_rsvB, aes(x = x_axis, y = y_axis, color = Country)) +
   geom_point() +
-  geom_text(
-    label = paste(mds_snp_meta_rsvA$Collection_Season, mds_snp_meta_rsvA$MMWRweek, sep = "_"),
-    check_overlap = TRUE
-  )
-plot_rsvA_mds_snp_label
+  theme_minimal()
+plot_rsvB_mds_snp_label
+
+plot_rsvB_mds_snp_label <- ggplot(mds_snp_meta_rsvB, aes(x = x_axis, y = y_axis, color = `EU/GER`)) +
+  geom_point() +
+  scale_color_manual(values = c("GER" = "red", "EU" =  "blue", "Ref" = "green")) +
+  scale_fill_manual(values = c("GER" = "red", "EU" =  "blue", "Ref" = "green")) + 
+  theme_minimal()
+plot_rsvB_mds_snp_label
 
 plot_rsvB_mds_snp_label <- ggplot(mds_snp_meta_rsvB, aes(x = x_axis, y = y_axis, color = Collection_Season)) +
   geom_point() +

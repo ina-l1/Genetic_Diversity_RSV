@@ -28,7 +28,6 @@ meta_rsvB$Collection_Date <- as.Date(meta_rsvB$Collection_Date, format = "%Y-%m-
 meta_rsvA$Collection_YearWeek <- paste(meta_rsvA$MMWRyear, 
                                        ifelse(meta_rsvA$MMWRweek < 10, paste0("0", meta_rsvA$MMWRweek), meta_rsvA$MMWRweek), 
                                        sep = "/")
-
 meta_rsvB$Collection_YearWeek <- paste(meta_rsvB$MMWRyear, 
                                        ifelse(meta_rsvB$MMWRweek < 10, paste0("0", meta_rsvB$MMWRweek), meta_rsvB$MMWRweek), 
                                        sep = "/")
@@ -83,8 +82,8 @@ for(i in 1:(nrow(dates_df)-(sliding_window_size - 1))) {
 # RSV-A and RSV-B: Replace rsvA/rsvB
 # Diversity Measures: Replace snpdist/pairdist/hamdist
 
-dist_rsvB_GER <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Germany/snpdist_rsvB.csv")
-dist_rsvB_EU <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/snpdist_rsvB_EU_noGer.csv")
+dist_rsvB_GER <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Germany/pairdist_rsvB.csv")
+dist_rsvB_EU <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/pairdist_rsvB_EU_noGer.csv")
 
 dist_rsvB_GER <- arrange(dist_rsvB_GER, dist_rsvB_GER[,1])
 dist_rsvB_GER <- dist_rsvB_GER[,-1]
@@ -102,7 +101,7 @@ colnames(dist_rsvB_EU) <- meta_rsvB_EU$Accession
 
 ## GER
 dist_mean_GER <- data.frame("window" =  1:nrow(sliding_window), "num" = 0, "dist_mean" = 0, "dist_std" = 0, "start_date" = sliding_window$start_date)
-violin_rsvB_GER_df <- data.frame(matrix(ncol = 3, nrow = 0))
+violin_GER_df <- data.frame(matrix(ncol = 3, nrow = 0))
 
 for(window_index in 1:nrow(sliding_window)) {
   dist_sum <- 0
@@ -138,7 +137,7 @@ for(window_index in 1:nrow(sliding_window)) {
     temp_df[,2] <- sliding_window[window_index, "start_date"]
     temp_df[,3] <- dist_vec
     
-    violin_rsvB_GER_df <- rbind(violin_rsvB_GER_df, temp_df)
+    violin_GER_df <- rbind(violin_GER_df, temp_df)
     
     number_pairwise_dist <- (acc_length*(acc_length-1))/2
     mean <- dist_sum/number_pairwise_dist
@@ -149,18 +148,18 @@ for(window_index in 1:nrow(sliding_window)) {
   }
 }
 
-colnames(violin_rsvB_GER_df) <- c("window", "start_date", "dist")
+colnames(violin_GER_df) <- c("window", "start_date", "dist")
 
 'ggplot(dist_mean_GER, aes(x = start_date, y = dist_mean)) +
   geom_point() +
   geom_errorbar(aes(ymin = dist_mean-dist_std, ymax = dist_mean+dist_std))
 
-ggplot(violin_rsvB_GER_df, aes(x = as.factor(start_date), y = dist, colour = "red")) +
+ggplot(violin_GER_df, aes(x = as.factor(start_date), y = dist, colour = "red")) +
   geom_violin()'
 
 ## EU
 dist_mean_EU <- data.frame("window" =  1:nrow(sliding_window), "num" = 0, "dist_mean" = 0, "dist_std" = 0, "start_date" = sliding_window$start_date)
-violin_rsvB_EU_df <- data.frame(matrix(ncol = 3, nrow = 0))
+violin_EU_df <- data.frame(matrix(ncol = 3, nrow = 0))
 
 for(window_index in 1:nrow(sliding_window)) {
   dist_sum <- 0
@@ -200,7 +199,7 @@ for(window_index in 1:nrow(sliding_window)) {
     temp_df[,2] <- sliding_window[window_index, "start_date"]
     temp_df[,3] <- dist_vec
     
-    violin_rsvB_EU_df <- rbind(violin_rsvB_EU_df, temp_df)
+    violin_EU_df <- rbind(violin_EU_df, temp_df)
     
     dist_mean_EU[window_index, "dist_std"] <- sd(unlist(dist_vec))
     #sqrt(sum(unlist(lapply(dist_vec, function(x) (x - mean)**2)))/(number_pairwise_dist))
@@ -208,36 +207,56 @@ for(window_index in 1:nrow(sliding_window)) {
   }
 }
 
-colnames(violin_rsvB_EU_df) <- c("window", "start_date", "dist")
+colnames(violin_EU_df) <- c("window", "start_date", "dist")
   
 'ggplot(dist_mean_EU, aes(x = start_date, y = dist_mean)) + 
   geom_point() +
   geom_errorbar(aes(ymin = dist_mean-dist_std, ymax = dist_mean+dist_std))
 
-ggplot(violin_rsvB_EU_df, aes(x = as.factor(window), y = dist)) +
+ggplot(violin_EU_df, aes(x = as.factor(window), y = dist)) +
   geom_violin()'
 
 # Plot EU + GER
-
+## Pair
 sliding_window_plot <- ggplot(dist_mean_GER, aes(x = start_date, y = dist_mean)) +
-  geom_errorbar(data = dist_mean_EU, aes(ymin = dist_mean-dist_std, ymax = dist_mean+dist_std), colour = "grey") +
+  geom_errorbar(data = dist_mean_EU, aes(ymin = dist_mean-dist_std, ymax = dist_mean+dist_std), colour = "lightgrey") +
   geom_errorbar(aes(ymin = dist_mean-dist_std, ymax = dist_mean+dist_std), colour = "black", alpha = 0.45) +
   geom_point(colour = "red") +
-  geom_point(data = dist_mean_EU, aes(x = start_date, y = dist_mean), colour = "blue")
+  geom_point(data = dist_mean_EU, aes(x = start_date, y = dist_mean), colour = "blue") +
+  geom_line(aes(y = num/20000), colour = "red") +
+  geom_line(aes(y = dist_mean_EU$num/20000), colour = "blue") +
+  geom_line(aes(y = (num + dist_mean_EU$num)/20000), colour = "black", alpha = 0.4) +
+  scale_x_continuous(breaks = c(2014:2023)) +
+  theme_minimal() +
+  scale_y_continuous("distance (mean)", sec.axis = sec_axis(~.*20000, name="sequence count"), limits = c(0, 0.02)) # IF NECESSARY ADJUST Y-AXIS
+sliding_window_plot
+
+## SNP
+sliding_window_plot <- ggplot(dist_mean_GER, aes(x = start_date, y = dist_mean)) +
+  geom_errorbar(data = dist_mean_EU, aes(ymin = dist_mean-dist_std, ymax = dist_mean+dist_std), colour = "lightgrey") +
+  geom_errorbar(aes(ymin = dist_mean-dist_std, ymax = dist_mean+dist_std), colour = "black", alpha = 0.45) +
+  geom_point(colour = "red") +
+  geom_point(data = dist_mean_EU, aes(x = start_date, y = dist_mean), colour = "blue") +
+  geom_line(aes(y = num/1.33), colour = "red") +
+  geom_line(aes(y = dist_mean_EU$num/1.33), colour = "blue") +
+  geom_line(aes(y = (num + dist_mean_EU$num)/1.33), colour = "black", alpha = 0.4) +
+  scale_x_continuous(breaks = c(2014:2023)) +
+  theme_minimal() +
+  scale_y_continuous("distance (mean)", sec.axis = sec_axis(~.*1.33, name="sequence count"), limits = c(0, 300)) # IF NECESSARY ADJUST Y-AXIS
 sliding_window_plot
 
 # Violin Plot
 
-violin_rsvB_GER_df$'EU/GER' <- "GER"
-violin_rsvB_EU_df$'EU/GER' <- "EU"
+violin_GER_df$'EU/GER' <- "GER"
+violin_EU_df$'EU/GER' <- "EU"
 
-violin_GER_EU_df <- rbind(violin_rsvB_GER_df, violin_rsvB_EU_df)
+violin_GER_EU_df <- rbind(violin_GER_df, violin_EU_df)
 violin_GER_EU_df <- arrange(violin_GER_EU_df, window)
 
-violin_rsvB_df <- data.frame("window" = sliding_window$index)
-violin_rsvB_df <- full_join(violin_rsvB_df, violin_GER_EU_df, by = "window")
+violin_df <- data.frame("window" = sliding_window$index)
+violin_df <- full_join(violin_df, violin_GER_EU_df, by = "window")
 
-ggplot(violin_rsvB_df, aes(x = factor(window), y = dist, fill = `EU/GER`, colour = `EU/GER`)) +
+ggplot(violin_df, aes(x = factor(window), y = dist, fill = `EU/GER`, colour = `EU/GER`)) +
   geom_violin() +
   scale_colour_manual(values = c("GER" = "red", "EU" = "blue")) +
   scale_fill_manual(values = c("GER" = "red", "EU" = "blue")) +

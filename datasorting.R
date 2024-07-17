@@ -17,15 +17,15 @@ RefSeq_rsvB <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/RefSeq/RefSeq_rsv
 # German sequences 
 
 # Sequence information for NCBI WGS sequences starting from 2014/2015 season 
-rsvA <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/NCBI_rsvA_wgs_europe_2015.csv")
-rsvB <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/NCBI_rsvB_wgs_europe_2015.csv")
+rsvA <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Germany/NCBI_rsvA_wgs_germany_2015.csv")
+rsvB <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Germany/NCBI_rsvB_wgs_germany_2015.csv")
 
-rsvA_nextclade <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/nextclade_rsvA_EU.csv") #Nextclade output
-rsvB_nextclade <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/nextclade_rsvB_EU.csv")
+rsvA_nextclade <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Germany/nextclade_rsvA.csv") #Nextclade output
+rsvB_nextclade <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Germany/nextclade_rsvB.csv")
 
 # Reformat Dates
-rsvA$Collection_Date <- as.Date(rsvA$Collection_Date, format = "%Y-%m-%d") #%m/%d/%Y
-rsvB$Collection_Date <- as.Date(rsvB$Collection_Date, format = "%Y-%m-%d")
+rsvA$Collection_Date <- as.Date(rsvA$Collection_Date, format = "%m/%d/%Y") #%Y-%m-%d
+rsvB$Collection_Date <- as.Date(rsvB$Collection_Date, format = "%m/%d/%Y")
 
 rsvA$Collection_Year <- as.numeric(format(rsvA$Collection_Date,"%Y"))
 rsvA$Collection_Month <- as.numeric(format(rsvA$Collection_Date,"%m"))
@@ -76,7 +76,7 @@ rsvB_ref <- cbind(rsvB_ref, rsvB_clades)
 #write.csv(rsvA_ref, file = "~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvA_ref_metadata.csv", row.names = FALSE)
 #write.csv(rsvB_ref, file = "~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvB_ref_metadata.csv", row.names = FALSE)
 
-#write.csv(rsvAB, file = "~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvAB_metadata_EU.csv")
+#write.csv(rsvAB, file = "~/Yale_Projects/Genetic_Diversity_RSV/Germany/rsvAB_metadata_GER.csv")
 
 ##########################################################
 
