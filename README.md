@@ -3,7 +3,6 @@ This is the GitHub respository for the following ongoing project:
 **Investigating the Dynamics of RSV Genetic Diversity during an Epidemic Cycle**
 
 # Abstract
-Investigating the Dynamics of RSV Genetic Diversity during an Epidemic Cycle
 
 ## Background and aims
 Respiratory syncytial virus (RSV) is divided into two antigenically distinct subtypes, 
