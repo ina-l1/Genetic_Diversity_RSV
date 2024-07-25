@@ -1,5 +1,9 @@
 # Overview
+<<<<<<< HEAD
 This is the GitHub repository for the following ongoing project:
+=======
+This is the GitHub respository for the following ongoing project:
+>>>>>>> ccbf9ee0dcf0bf60111e3e3cb89b35ece0dc9e86
 
 **Investigating the Dynamics of RSV Genetic Diversity during an Epidemic Cycle**
 
@@ -29,6 +33,12 @@ Ke Li, Department of Epidemiology of Microbial Diseases, Yale School of Public H
 
 Yi Ting Chew, Department of Epidemiology of Microbial Diseases, Yale School of Public Health, USA.
 
+<<<<<<< HEAD
 Virginia E. Pitzer, Department of Epidemiology of Microbial Diseases, Yale School of Public Health, USA.
 
 Daniel Weinberger, Department of Epidemiology of Microbial Diseases, Yale School of Public Health, USA.
+=======
+Daniel Weinberger, Department of Epidemiology of Microbial Diseases, Yale School of Public Health, USA.
+
+Virginia E. Pitzer, Department of Epidemiology of Microbial Diseases, Yale School of Public Health, USA.
+>>>>>>> ccbf9ee0dcf0bf60111e3e3cb89b35ece0dc9e86
