@@ -19,7 +19,7 @@ The observed trend in RSV genetic diversity of German sequences indicates that t
 Examining the temporal pattern of genetic diversity within an epidemic cycle demonstrates the transmission of RSV lineages throughout a season and reveals potential indicators for subtype dominance changes before the following season. The increased resolution achieved through this analysis provides further insight for future RSV surveillance and public health strategies.
 
 ## Authors
-Ina Li, RWTH Aachen University, Germany.
+Ina Li, RWTH Aachen University, Germany / Department of Epidemiology of Microbial Diseases, Yale School of Public Health, USA.
 
 Jiye Kwon, Department of Epidemiology of Microbial Diseases, Yale School of Public Health, USA.
 
