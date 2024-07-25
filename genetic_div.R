@@ -5,11 +5,12 @@
 library(dplyr)
 library(stringr)
 library(ape)
-library(bio3d)
+#library(bio3d)
 library(ggplot2)
 library(plotly)
 library(adegenet)
-library(usedist)
+library(usedist) #dist_groups()
+library(phangorn) #https://cran.r-project.org/web/packages/phangorn/phangorn.pdf dist.hamming() and dist.ml()
 
 # Read sequence alignment and metadata
 
@@ -38,6 +39,10 @@ meta_rsvB_short <- subset(meta_rsvB, select = c("Accession", "Type", "Collection
 meta_rsvB_short$plotlabel <- paste(meta_rsvB_short$Accession, meta_rsvB_short$Collection_Season, meta_rsvB_short$MMWRweek, meta_rsvB_short$Country, sep = "_")
 
 # Pairwise Distances from DNA Sequences
+dist_rsvA <- dist.ml(aln_rsvA, 
+                     model = "GTR",
+                     exclude = "none")
+
 
 # Maybe use dist() for euclidian distance
 dist_rsvA <- dist.dna(aln_rsvA, model = "K81", #evolutionary model 
@@ -66,6 +71,7 @@ rownames(snp_dist_rsvB) <- snp_dist_rsvB[, 1]
 snp_dist_rsvB <- snp_dist_rsvB[, -1]
 
 # Hamming Distance
+# use dist.hamming?
 
 ham_dist_rsvA <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/snpdist_rsvA_protein.csv")
 rownames(ham_dist_rsvA) <- ham_dist_rsvA[, 1]
