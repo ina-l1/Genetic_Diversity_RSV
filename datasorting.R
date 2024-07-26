@@ -144,3 +144,14 @@ rsvB_seqNum_EU <- as.data.frame(table(rsvB_meta_EU$Country))
 
 rsvA_seqNum_season_EU <- as.data.frame.matrix(table(rsvA_meta_EU$Country, rsvA_meta_EU$Collection_Season))
 rsvB_seqNum_season_EU <- as.data.frame.matrix(table(rsvB_meta_EU$Country, rsvB_meta_EU$Collection_Season))
+
+rsvA_meta_EU$'EU/GER' <- ifelse(rsvA_meta_EU$Country == "Germany", "GER", "EU")
+rsvB_meta_EU$'EU/GER' <- ifelse(rsvB_meta_EU$Country == "Germany", "GER", "EU")
+
+rsvA_seqNum_EUGER <- as.data.frame.matrix(table(rsvA_meta_EU$`EU/GER`, rsvA_meta_EU$Collection_Season))
+rsvA_seqNum_EUGER[3,] <- (rsvA_seqNum_EUGER[2,]/rsvA_seqNum_EUGER[1,])*100
+rownames(rsvA_seqNum_EUGER)[3] <- "GER/EU [%]"
+
+rsvB_seqNum_EUGER <- as.data.frame.matrix(table(rsvB_meta_EU$`EU/GER`, rsvB_meta_EU$Collection_Season))
+rsvB_seqNum_EUGER[3,] <- (rsvB_seqNum_EUGER[2,]/rsvB_seqNum_EUGER[1,])*100
+rownames(rsvB_seqNum_EUGER)[3] <- "GER/EU [%]"

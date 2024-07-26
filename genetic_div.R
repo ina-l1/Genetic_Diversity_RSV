@@ -38,27 +38,21 @@ meta_rsvB[which(meta_rsvB$Accession == RefSeq_rsvB), c("Collection_Season", "EU/
 meta_rsvB_short <- subset(meta_rsvB, select = c("Accession", "Type", "Collection_Date", "Collection_Season", "MMWRyear", "MMWRweek", "Country", "EU/GER"))
 meta_rsvB_short$plotlabel <- paste(meta_rsvB_short$Accession, meta_rsvB_short$Collection_Season, meta_rsvB_short$MMWRweek, meta_rsvB_short$Country, sep = "_")
 
-# Pairwise Distances from DNA Sequences
-dist_rsvA <- dist.ml(aln_rsvA, 
-                     model = "GTR",
-                     exclude = "none")
-
-
-# Maybe use dist() for euclidian distance
-dist_rsvA <- dist.dna(aln_rsvA, model = "K81", #evolutionary model 
+# Evolutionary Distances from DNA Sequences
+evo_dist_rsvA <- dist.dna(aln_rsvA, model = "TN93", #evolutionary model 
                       variance = FALSE, #compute variances of distances
                       gamma = FALSE, #correction of distances
                       pairwise.deletion = FALSE, #delete sites with missing data
                       as.matrix = TRUE) #return results as matrix or object of class dist
 
-dist_rsvB <- dist.dna(aln_rsvB, model = "K81", 
+evo_dist_rsvB <- dist.dna(aln_rsvB, model = "TN93", 
                       variance = FALSE, 
                       gamma = FALSE,
                       pairwise.deletion = FALSE,
                       as.matrix = TRUE)
 
-#write.csv(dist_rsvA, file = "~/Yale_Projects/Genetic_Diversity_RSV/Europe/pairdist_rsvA_EU.csv")
-#write.csv(dist_rsvB, file = "~/Yale_Projects/Genetic_Diversity_RSV/Europe/pairdist_rsvB_EU.csv")
+write.csv(evo_dist_rsvA, file = "~/Yale_Projects/Genetic_Diversity_RSV/Europe/evodist_rsvA_EU.csv")
+write.csv(evo_dist_rsvB, file = "~/Yale_Projects/Genetic_Diversity_RSV/Europe/evodist_rsvB_EU.csv")
 
 # SNP distance with snp-dists
 
@@ -81,28 +75,14 @@ ham_dist_rsvB <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/snpdist_
 rownames(ham_dist_rsvB) <- ham_dist_rsvB[, 1]
 ham_dist_rsvB <- ham_dist_rsvB[, -1]
 
-# Shannon Entropy
-
-'shannon_rsvA <- entropy(aln_shannon_rsvA)
-shannon_H_rsvA <- shannon_rsvA$H
-shannon_H_rsvA_df <- as.data.frame(shannon_H_rsvA)
-shannon_H_rsvA_df$position <- as.numeric(rownames(shannon_H_rsvA_df))
-colnames(shannon_H_rsvA_df) <- c("shannon_entropy", "position")
-shannon_H_rsvA_df <- relocate(shannon_H_rsvA_df, position)
-
-shannon_plot <- ggplot(shannon_H_rsvA_df, aes(x = position, y = shannon_entropy)) +
-  geom_line() +
-  scale_x_continuous(breaks = seq(0, 15000, 1000))
-shannon_plot'
-
 # Classic multidimensional scaling (MDS)
 
-# Pairwise distance
-mds_pair_rsvA_eig <- cmdscale(dist_rsvA, k = 2, eig = TRUE) #k dim
-mds_rsvA <- as.data.frame(mds_pair_rsvA_eig[1])
+# Evolutionary distance
+mds_evo_rsvA_eig <- cmdscale(evo_dist_rsvA, k = 2, eig = TRUE) #k dim
+mds_evo_rsvA <- as.data.frame(mds_evo_rsvA_eig[1])
 
-mds_pair_rsvB_eig <- cmdscale(dist_rsvB, k = 2, eig = TRUE)
-mds_rsvB <- as.data.frame(mds_pair_rsvB_eig[1])
+mds_evo_rsvB_eig <- cmdscale(evo_dist_rsvB, k = 2, eig = TRUE)
+mds_evo_rsvB <- as.data.frame(mds_evo_rsvB_eig[1])
 
 # SNP distance
 mds_snp_rsvA_eig <- cmdscale(snp_dist_rsvA, k = 2, eig = TRUE)
@@ -120,16 +100,16 @@ mds_ham_rsvB <- as.data.frame(mds_ham_rsvB_eig[1])
 
 # Plot MDS
 
-#Pairwise distance 
-x_mds_rsvA <- mds_rsvA[, 1]
-y_mds_rsvA <- mds_rsvA[, 2]
+# Evolutionary distance 
+x_mds_evo_rsvA <- mds_evo_rsvA[, 1]
+y_mds_evo_rsvA <- mds_evo_rsvA[, 2]
 
-plot_mds_rsvA <- plot(x_mds_rsvA, y_mds_rsvA)
+plot_mds_evo_rsvA <- plot(x_mds_evo_rsvA, y_mds_evo_rsvA)
 
-x_mds_rsvB <- mds_rsvB[, 1]
-y_mds_rsvB <- mds_rsvB[, 2]
+x_mds_evo_rsvB <- mds_evo_rsvB[, 1]
+y_mds_evo_rsvB <- mds_evo_rsvB[, 2]
 
-plot_mds_rsvB <- plot(x_mds_rsvB, y_mds_rsvB)
+plot_mds_evo_rsvB <- plot(x_mds_evo_rsvB, y_mds_evo_rsvB)
 
 # SNP distance
 x_mds_snp_rsvA <- mds_snp_rsvA[, 1]
@@ -155,22 +135,22 @@ plot_mds_ham_rsvB <- plot(x_mds_ham_rsvB, y_mds_ham_rsvB)
 
 # Calculate proportion of variance explained through MDS
 
-## Pairwise distance
-eigenvalues_pair <- mds_pair_rsvA_eig$eig
-total_variance_pair <- sum(eigenvalues_pair[eigenvalues_pair > 0])
-variance_explained_dim1_pair <- eigenvalues_pair[1] / total_variance_pair
-variance_explained_dim2_pair <- eigenvalues_pair[2] / total_variance_pair
+## Evolutionary distance
+eigenvalues_evo <- mds_evo_rsvA_eig$eig
+total_variance_evo <- sum(eigenvalues_evo[eigenvalues_evo > 0])
+variance_explained_dim1_evo <- eigenvalues_evo[1] / total_variance_evo
+variance_explained_dim2_evo <- eigenvalues_evo[2] / total_variance_evo
 # Combined variance explained by the two dimensions
-combined_variance_explained_pair <- variance_explained_dim1_pair + variance_explained_dim2_pair
-combined_variance_explained_pair
+combined_variance_explained_evo <- variance_explained_dim1_evo + variance_explained_dim2_evo
+combined_variance_explained_evo
 
-eigenvalues_pair <- mds_pair_rsvB_eig$eig
-total_variance_pair <- sum(eigenvalues_pair[eigenvalues_pair > 0])
-variance_explained_dim1_pair <- eigenvalues_pair[1] / total_variance_pair
-variance_explained_dim2_pair <- eigenvalues_pair[2] / total_variance_pair
+eigenvalues_evo <- mds_evo_rsvB_eig$eig
+total_variance_evo <- sum(eigenvalues_evo[eigenvalues_evo > 0])
+variance_explained_dim1_evo <- eigenvalues_evo[1] / total_variance_evo
+variance_explained_dim2_evo <- eigenvalues_evo[2] / total_variance_evo
 # Combined variance explained by the two dimensions
-combined_variance_explained_pair <- variance_explained_dim1_pair + variance_explained_dim2_pair
-combined_variance_explained_pair
+combined_variance_explained_evo <- variance_explained_dim1_evo + variance_explained_dim2_evo
+combined_variance_explained_evo
 
 ## SNP distance
 eigenvalues_snp <- mds_snp_rsvA_eig$eig
@@ -200,21 +180,21 @@ combined_variance_explained_ham <- variance_explained_dim1_ham + variance_explai
 # Plot MDS with labels 
 
 # PAIRWISE: Create df with labels
-df_mds_rsvA <- data.frame(x_axis = x_mds_rsvA, y_axis = y_mds_rsvA)
-df_mds_rsvA$ID <- as.numeric(rownames(df_mds_rsvA))
-df_mds_rsvA <- relocate(df_mds_rsvA, ID)
-rownames(df_mds_rsvA) <- c(1:nrow(df_mds_rsvA))
-df_mds_rsvA <- arrange(df_mds_rsvA, ID)
+df_mds_evo_rsvA <- data.frame(x_axis = x_mds_evo_rsvA, y_axis = y_mds_evo_rsvA)
+df_mds_evo_rsvA$ID <- as.numeric(rownames(df_mds_evo_rsvA))
+df_mds_evo_rsvA <- relocate(df_mds_evo_rsvA, ID)
+rownames(df_mds_evo_rsvA) <- c(1:nrow(df_mds_evo_rsvA))
+df_mds_evo_rsvA <- arrange(df_mds_evo_rsvA, ID)
 
-mds_meta_rsvA <- cbind(meta_rsvA_short, df_mds_rsvA)
+mds_evo_meta_rsvA <- cbind(meta_rsvA_short, df_mds_evo_rsvA)
 
-df_mds_rsvB <- data.frame(x_axis = x_mds_rsvB, y_axis = y_mds_rsvB)
-df_mds_rsvB$ID <- as.numeric(rownames(df_mds_rsvB))
-df_mds_rsvB <- relocate(df_mds_rsvB, ID)
-rownames(df_mds_rsvB) <- c(1:nrow(df_mds_rsvB))
-df_mds_rsvB <- arrange(df_mds_rsvB, ID)
+df_mds_evo_rsvB <- data.frame(x_axis = x_mds_evo_rsvB, y_axis = y_mds_evo_rsvB)
+df_mds_evo_rsvB$ID <- as.numeric(rownames(df_mds_evo_rsvB))
+df_mds_evo_rsvB <- relocate(df_mds_evo_rsvB, ID)
+rownames(df_mds_evo_rsvB) <- c(1:nrow(df_mds_evo_rsvB))
+df_mds_evo_rsvB <- arrange(df_mds_evo_rsvB, ID)
 
-mds_meta_rsvB <- cbind(meta_rsvB_short, df_mds_rsvB)
+mds_evo_meta_rsvB <- cbind(meta_rsvB_short, df_mds_evo_rsvB)
 
 # SNP: Create df with labels
 df_mds_snp_rsvA <- data.frame(x_axis = x_mds_snp_rsvA, y_axis = y_mds_snp_rsvA)
@@ -252,30 +232,29 @@ mds_ham_meta_rsvB <- cbind(meta_rsvB_short, df_mds_ham_rsvB)
 
 # MDS Plots
 
-# Pairwise distance
-
-plot_rsvB_mds_label <- ggplot(mds_meta_rsvB, aes(x = x_axis, y = y_axis, color = Country)) + #color = Country
+# Evolutionary distance
+plot_rsvA_mds_evo_label <- ggplot(mds_evo_meta_rsvA, aes(x = x_axis, y = y_axis, color = Country)) + #color = Country
   geom_point() +
   theme_minimal()
-plot_rsvB_mds_label
+plot_rsvA_mds_evo_label
 
-plot_rsvB_mds_label <- ggplot(mds_meta_rsvB, aes(x = x_axis, y = y_axis, color = `EU/GER`)) + #color = Collection_Season
+plot_rsvA_mds_evo_label <- ggplot(mds_evo_meta_rsvA, aes(x = x_axis, y = y_axis, color = `EU/GER`)) + #color = Collection_Season
   geom_point() +
   scale_color_manual(values = c("GER" = "red", "EU" =  "blue", "Ref" = "green")) +
   scale_fill_manual(values = c("GER" = "red", "EU" =  "blue", "Ref" = "green")) + 
   theme_minimal()
-plot_rsvB_mds_label
+plot_rsvA_mds_evo_label
 
-plot_rsvB_mds_label <- ggplot(mds_meta_rsvB, aes(x = x_axis, y = y_axis, color = `EU/GER`)) + #color = Collection_Season
+plot_rsvB_mds_evo_label <- ggplot(mds_evo_meta_rsvB, aes(x = x_axis, y = y_axis, color = `EU/GER`)) + #color = Collection_Season
   geom_point() +
   geom_text(
-    label = mds_meta_rsvB$plotlabel,
+    label = mds_evo_meta_rsvB$plotlabel,
     check_overlap = TRUE
   ) +
   scale_color_manual(values = c("GER" = "red", "EU" =  "blue", "Ref" = "green")) +
   scale_fill_manual(values = c("GER" = "red", "EU" =  "blue", "Ref" = "green")) +
   theme_minimal()
-plot_rsvB_mds_label
+plot_rsvB_mds_evo_label
 
 # SNP distance
 plot_rsvB_mds_snp_label <- ggplot(mds_snp_meta_rsvB, aes(x = x_axis, y = y_axis, color = Country)) +
@@ -317,38 +296,38 @@ plot_rsvB_mds_ham_label
 
 # Remove Ref
 
-# Pairwise distance
-mds_noref_rsvA <- filter(mds_meta_rsvA, Collection_Season != "Ref")
+# Evolutionary distance
+mds_evo_noref_rsvA <- filter(mds_evo_meta_rsvA, Collection_Season != "Ref")
 
-plot_rsvA_mds_label_noref <- ggplot(mds_noref_rsvA, aes(x = x_axis, y = y_axis, color = Collection_Season)) +
+plot_rsvA_mds_evo_label_noref <- ggplot(mds_evo_noref_rsvA, aes(x = x_axis, y = y_axis, color = Collection_Season)) +
   geom_point() +
   geom_text(
-    label = paste(mds_noref_rsvA$Collection_Season, mds_noref_rsvA$MMWRweek, sep = "_"),
+    label = paste(mds_evo_noref_rsvA$Collection_Season, mds_evo_noref_rsvA$MMWRweek, sep = "_"),
     check_overlap = TRUE
   ) +
   labs(title = "MDS Pairwise Distance RSV-A") +
   theme(
     axis.title = element_blank()
   )
-plot_rsvA_mds_label_noref
+plot_rsvA_mds_evo_label_noref
 
-#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/Plots/mds_pair_rsvA_noref_EU.png", width = 25, height = 20, units = "cm", limitsize = FALSE)
+#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/Plots/mds_evo_rsvA_noref_EU.png", width = 25, height = 20, units = "cm", limitsize = FALSE)
 
-mds_noref_rsvB <- filter(mds_meta_rsvB, Collection_Season != "Ref")
+mds_evo_noref_rsvB <- filter(mds_evo_meta_rsvB, Collection_Season != "Ref")
 
-plot_rsvB_mds_label_noref <- ggplot(mds_noref_rsvB, aes(x = x_axis, y = y_axis, color = Collection_Season)) +
+plot_rsvB_mds_evo_label_noref <- ggplot(mds_evo_noref_rsvB, aes(x = x_axis, y = y_axis, color = Collection_Season)) +
   geom_point() +
   geom_text(
-    label = paste(mds_noref_rsvB$Collection_Season, mds_noref_rsvB$MMWRweek, sep = "_"),
+    label = paste(mds_evo_noref_rsvB$Collection_Season, mds_evo_noref_rsvB$MMWRweek, sep = "_"),
     check_overlap = TRUE
   ) +
   labs(title = "MDS Pairwise Distance RSV-B") +
   theme(
     axis.title = element_blank()
   )
-plot_rsvB_mds_label_noref
+plot_rsvB_mds_evo_label_noref
 
-#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/Plots/mds_pair_rsvB_noref_EU.png", width = 25, height = 20, units = "cm", limitsize = FALSE)
+#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/Plots/mds_evo_rsvB_noref_EU.png", width = 25, height = 20, units = "cm", limitsize = FALSE)
 
 # SNP distance 
 mds_snp_noref_rsvA <- filter(mds_snp_meta_rsvA, Collection_Season != "Ref")
@@ -418,101 +397,59 @@ plot_rsvB_mds_ham_label_noref
 
 # Violin Plot 
 
-# Pairwise distance
-dist_rsvA <- dist_rsvA[order(rownames(snp_dist_rsvA)),]
-distgroup_pair_rsvA <- dist_groups(dist_rsvA, meta_rsvA_short$Collection_Season)
+# Evolutionary distance
+evo_dist_rsvA <- evo_dist_rsvA[order(rownames(evo_dist_rsvA)),]
+distgroup_evo_rsvA <- dist_groups(evo_dist_rsvA, meta_rsvA_short$Collection_Season)
 
-distgroup_within_pair_rsvA <- subset(distgroup_pair_rsvA, Group1 == Group2)
-distgroup_within_pair_rsvA$Season <- distgroup_within_pair_rsvA$Group1
+distgroup_within_evo_rsvA <- subset(distgroup_evo_rsvA, Group1 == Group2)
+distgroup_within_evo_rsvA$Season <- distgroup_within_evo_rsvA$Group1
 
-distgroup_between_pair_rsvA <- subset(distgroup_pair_rsvA, Group1 != Group2)
-distgroup_between_pair_rsvA$Between_Season <- paste(distgroup_between_pair_rsvA$Group1, 
+distgroup_between_evo_rsvA <- subset(distgroup_evo_rsvA, Group1 != Group2)
+distgroup_between_evo_rsvA$Between_Season <- paste(distgroup_between_evo_rsvA$Group1, 
                                                     "&",
-                                                    distgroup_between_pair_rsvA$Group2,
+                                                    distgroup_between_evo_rsvA$Group2,
                                                     sep = "")
 
-plot_violin_pair_within_rsvA <- ggplot(distgroup_within_pair_rsvA, aes(x = Season, y = Distance)) +
+plot_violin_evo_within_rsvA <- ggplot(distgroup_within_evo_rsvA, aes(x = Season, y = Distance)) +
   geom_violin() +
   stat_summary(fun.data = "mean_cl_boot",
                geom = "crossbar", width = 0.05, color = "red")
-plot_violin_pair_within_rsvA
+plot_violin_evo_within_rsvA
 
-#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/Plots/violin_rsvA_pair_within_EU.png", width = 25, height = 20, units = "cm", limitsize = FALSE)
+#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/Plots/violin_rsvA_evo_within_EU.png", width = 25, height = 20, units = "cm", limitsize = FALSE)
 
-plot_violin_pair_between_rsvA <- ggplot(distgroup_between_pair_rsvA, aes(x = Between_Season, y = Distance)) +
+plot_violin_evo_between_rsvA <- ggplot(distgroup_between_evo_rsvA, aes(x = Between_Season, y = Distance)) +
   geom_violin()
-plot_violin_pair_between_rsvA
+plot_violin_evo_between_rsvA
 
 
-dist_rsvB <- dist_rsvB[order(rownames(snp_dist_rsvB)),]
-distgroup_pair_rsvB <- dist_groups(dist_rsvB, meta_rsvB_short$Collection_Season)
+evo_dist_rsvB <- evo_dist_rsvB[order(rownames(evo_dist_rsvB)),]
+distgroup_evo_rsvB <- dist_groups(evo_dist_rsvB, meta_rsvB_short$Collection_Season)
 
-distgroup_within_pair_rsvB <- subset(distgroup_pair_rsvB, Group1 == Group2)
-distgroup_within_pair_rsvB$Within_Season <- distgroup_within_pair_rsvB$Group1
+distgroup_within_evo_rsvB <- subset(distgroup_evo_rsvB, Group1 == Group2)
+distgroup_within_evo_rsvB$Within_Season <- distgroup_within_evo_rsvB$Group1
 
-distgroup_between_pair_rsvB <- subset(distgroup_pair_rsvB, Group1 != Group2)
+distgroup_between_evo_rsvB <- subset(distgroup_evo_rsvB, Group1 != Group2)
 
-distgroup_between_pair_rsvB <- subset(distgroup_pair_rsvB, Group1 != Group2)
-distgroup_between_pair_rsvB$Between_Season <- paste(distgroup_between_pair_rsvB$Group1, 
+distgroup_between_evo_rsvB <- subset(distgroup_evo_rsvB, Group1 != Group2)
+distgroup_between_evo_rsvB$Between_Season <- paste(distgroup_between_evo_rsvB$Group1, 
                                                     "&",
-                                                    distgroup_between_pair_rsvB$Group2,
+                                                    distgroup_between_evo_rsvB$Group2,
                                                     sep = "")
 
-plot_violin_pair_rsvB <- ggplot(distgroup_within_pair_rsvB, aes(x = Within_Season, y = Distance)) +
+plot_violin_evo_rsvB <- ggplot(distgroup_within_evo_rsvB, aes(x = Within_Season, y = Distance)) +
   geom_violin() +
   stat_summary(fun.data = "mean_cl_boot",
                geom = "crossbar", width = 0.05, color = "red")
-plot_violin_pair_rsvB
+plot_violin_evo_rsvB
 
-#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/Plots/violin_rsvB_pair_within_EU.png", width = 25, height = 20, units = "cm", limitsize = FALSE)
+#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/Plots/violin_rsvB_evo_within_EU.png", width = 25, height = 20, units = "cm", limitsize = FALSE)
 
-plot_violin_pair_between_rsvB <- ggplot(distgroup_between_pair_rsvB, aes(x = Between_Season, y = Distance)) +
+plot_violin_evo_between_rsvB <- ggplot(distgroup_between_evo_rsvB, aes(x = Between_Season, y = Distance)) +
   geom_violin()
-plot_violin_pair_between_rsvB
+plot_violin_evo_between_rsvB
 
 # SNP distance
-snp_dist_rsvA <- snp_dist_rsvA[order(rownames(snp_dist_rsvA)),] #sort alphabetically
-distgroup_snp_rsvA <- dist_groups(snp_dist_rsvA, meta_rsvA_short$Collection_Season)
-
-distgroup_within_snp_rsvA <- subset(distgroup_snp_rsvA, Group1 == Group2)
-distgroup_within_snp_rsvA$Season <- distgroup_within_snp_rsvA$Group1
-
-distgroup_between_snp_rsvA <- subset(distgroup_snp_rsvA, Group1 != Group2)
-distgroup_between_snp_rsvA$Between_Season <- paste(distgroup_between_snp_rsvA$Group1, 
-                                                    "&",
-                                                   distgroup_between_snp_rsvA$Group2,
-                                                    sep = "")
-
-plot_violin_snp_rsvA <- ggplot(distgroup_within_snp_rsvA, aes(x = Season, y = Distance)) +
-  geom_violin() +
-  stat_summary(fun.data = "mean_cl_boot",
-               geom = "crossbar", width = 0.05, color = "red")
-plot_violin_snp_rsvA
-
-#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/Plots/violin_rsvA_snp_within_EU.png", width = 25, height = 20, units = "cm", limitsize = FALSE)
-
-plot_violin_snp_between_rsvA <- ggplot(distgroup_between_snp_rsvA, aes(x = Between_Season, y = Distance)) +
-  geom_violin()
-plot_violin_snp_between_rsvA
-
-
-snp_dist_rsvB <- snp_dist_rsvB[order(rownames(snp_dist_rsvB)),] #sort alphabetically
-distgroup_snp_rsvB <- dist_groups(snp_dist_rsvB, meta_rsvB_short$Collection_Season)
-
-distgroup_within_snp_rsvB <- subset(distgroup_snp_rsvB, Group1 == Group2)
-distgroup_within_snp_rsvB$Within_Season <- distgroup_within_snp_rsvB$Group1
-
-distgroup_between_snp_rsvB <- subset(distgroup_snp_rsvB, Group1 != Group2)
-distgroup_between_snp_rsvB$Between_Season <- paste(distgroup_between_snp_rsvB$Group1, 
-                                                   "&",
-                                                   distgroup_between_snp_rsvB$Group2,
-                                                   sep = "")
-
-plot_violin_snp_rsvB <- ggplot(distgroup_within_snp_rsvB, aes(x = Within_Season, y = Distance)) +
-  geom_violin() +
-  stat_summary(fun.data = "mean_cl_boot",
-               geom = "crossbar", width = 0.05, color = "red")
-plot_violin_snp_rsvB
 
 #ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/Plots/violin_rsvB_snp_within_EU.png", width = 25, height = 20, units = "cm", limitsize = FALSE)
 

@@ -80,10 +80,10 @@ for(i in 1:(nrow(dates_df)-(sliding_window_size - 1))) {
 # Distance matrix 
 
 # RSV-A and RSV-B: Replace rsvA/rsvB
-# Diversity Measures: Replace snpdist/pairdist/hamdist
+# Diversity Measures: Replace snpdist/evodist/hamdist
 
-dist_rsvB_GER <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Germany/pairdist_rsvB.csv")
-dist_rsvB_EU <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/pairdist_rsvB_EU_noGer.csv")
+dist_rsvB_GER <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Germany/evodist_rsvB.csv")
+dist_rsvB_EU <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/evodist_rsvB_EU_noGer.csv")
 
 dist_rsvB_GER <- arrange(dist_rsvB_GER, dist_rsvB_GER[,1])
 dist_rsvB_GER <- dist_rsvB_GER[,-1]
@@ -217,7 +217,7 @@ ggplot(violin_EU_df, aes(x = as.factor(window), y = dist)) +
   geom_violin()'
 
 # Plot EU + GER
-## Pair
+## Evo
 sliding_window_plot <- ggplot(dist_mean_GER, aes(x = start_date, y = dist_mean)) +
   geom_errorbar(data = dist_mean_EU, aes(ymin = dist_mean-dist_std, ymax = dist_mean+dist_std), colour = "lightgrey") +
   geom_errorbar(aes(ymin = dist_mean-dist_std, ymax = dist_mean+dist_std), colour = "black", alpha = 0.45) +
