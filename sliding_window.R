@@ -4,6 +4,8 @@
 # RSV-A and RSV-B
 # SNP, pairwise and Hamming distance
 
+# TO DO: Write function for sliding window!
+
 library(dplyr)
 library(tidyr)
 library(stringr)
@@ -16,6 +18,8 @@ library(usedist)
 library(lubridate)
 library(MMWRweek)
 library(Rmisc)
+
+#################################################################################
 
 # Read metadata
 
@@ -42,6 +46,8 @@ meta_rsvB_GER <- subset(meta_rsvB, Country == "Germany"| Accession == RefSeq_rsv
 meta_rsvA_EU <- subset(meta_rsvA, Country != "Germany"| Accession == RefSeq_rsvA)
 meta_rsvB_EU <- subset(meta_rsvB, Country != "Germany"| Accession == RefSeq_rsvB)
 
+#################################################################################
+
 # Timetable (df) with weeks and years
 
 # Start: 2014 W40
@@ -64,7 +70,7 @@ rownames(dates_df) <- dates_df$index
 
 # Determining window size and start/end date
 
-##'*SET WINDOW SIZE (weeks)*
+## SET WINDOW SIZE (weeks) ##
 sliding_window_size <- 8 
 
 sliding_window <- data.frame(matrix(ncol = 3))
@@ -82,139 +88,122 @@ for(i in 1:(nrow(dates_df)-(sliding_window_size - 1))) {
 # RSV-A and RSV-B: Replace rsvA/rsvB
 # Diversity Measures: Replace snpdist/evodist/hamdist
 
-dist_rsvB_GER <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Germany/evodist_rsvB.csv")
-dist_rsvB_EU <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/evodist_rsvB_EU_noGer.csv")
+rsvAB_choose <- "rsvA" ##
 
-dist_rsvB_GER <- arrange(dist_rsvB_GER, dist_rsvB_GER[,1])
-dist_rsvB_GER <- dist_rsvB_GER[,-1]
+dist_rsvA_GER <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Germany/evodist_rsvA.csv") ##
+dist_rsvA_EU <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/evodist_rsvA_EU_noGer.csv") ##
+dist_rsvB_GER <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Germany/evodist_rsvB.csv") ##
+dist_rsvB_EU <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/evodist_rsvB_EU_noGer.csv") ##
+
+dist_matrix_func <- function(distance_matrix) {
+  distance_matrix <- arrange(distance_matrix, distance_matrix[,1])
+  distance_matrix <- distance_matrix[,-1]
+  distance_matrix <- distance_matrix %>% select(order(colnames(.)))
+}
+
+dist_rsvA_GER <- dist_matrix_func(distance_matrix = dist_rsvA_GER)
+dist_rsvA_EU <- dist_matrix_func(distance_matrix = dist_rsvA_EU)
+dist_rsvB_GER <- dist_matrix_func(distance_matrix = dist_rsvB_GER)
+dist_rsvB_EU <- dist_matrix_func(distance_matrix = dist_rsvB_EU)
+
+rownames(dist_rsvA_GER) <- meta_rsvA_GER$Accession
+colnames(dist_rsvA_GER) <- meta_rsvA_GER$Accession
+
+rownames(dist_rsvA_EU) <- meta_rsvA_EU$Accession
+colnames(dist_rsvA_EU) <- meta_rsvA_EU$Accession
+
 rownames(dist_rsvB_GER) <- meta_rsvB_GER$Accession
-dist_rsvB_GER <- dist_rsvB_GER %>% select(order(colnames(.)))
 colnames(dist_rsvB_GER) <- meta_rsvB_GER$Accession
 
-dist_rsvB_EU <- arrange(dist_rsvB_EU, dist_rsvB_EU[,1])
-dist_rsvB_EU <- dist_rsvB_EU[,-1]
 rownames(dist_rsvB_EU) <- meta_rsvB_EU$Accession
-dist_rsvB_EU <- dist_rsvB_EU %>% select(order(colnames(.)))
 colnames(dist_rsvB_EU) <- meta_rsvB_EU$Accession
 
+if(rsvAB_choose == "rsvA") {
+  dist_rsvAB_GER <- dist_rsvA_GER
+  dist_rsvAB_EU <- dist_rsvA_EU
+  
+} else {
+  dist_rsvAB_GER <- dist_rsvB_GER
+  dist_rsvAB_EU <- dist_rsvB_EU
+}
+
+# Sliding window function
+
+sliding_window_func <- function(dist_mean_func_df, EUGER) {
+  
+  if(EUGER == "GER" & rsvAB_choose == "rsvA"){
+    meta <- meta_rsvA_GER
+    RefSeq <- RefSeq_rsvA
+    dist_matrix <- dist_rsvAB_GER
+  } else if(EUGER == "EU" & rsvAB_choose == "rsvA") {
+    meta <- meta_rsvA_EU
+    RefSeq <- RefSeq_rsvA
+    dist_matrix <- dist_rsvAB_EU
+  } else if(EUGER == "GER" & rsvAB_choose == "rsvB") {
+    meta <- meta_rsvB_GER
+    RefSeq <- RefSeq_rsvB
+    dist_matrix <- dist_rsvAB_GER
+  } else if(EUGER == "EU" & rsvAB_choose == "rsvB") {
+    meta <- meta_rsvB_EU
+    RefSeq <- RefSeq_rsvB
+    dist_matrix <- dist_rsvAB_EU
+  } else {
+    print("invalid arguments: Choose GER or EU.")
+  }
+  
+  for(window_index in 1:nrow(sliding_window)) {
+    dist_sum <- 0
+    dist_vec <- c()
+    acc_list <- c()
+    
+    for(acc_index0 in 1:nrow(meta)) {
+      if(meta$Accession[acc_index0] != RefSeq & 
+         decimal_date(meta$Collection_Date[acc_index0]) >= sliding_window[window_index, "start_date"] & 
+         decimal_date(meta$Collection_Date[acc_index0]) <= sliding_window[window_index, "end_date"]) {
+        acc_list <- append(acc_list, meta$Accession[acc_index0])
+      }
+    }
+    print(window_index)
+    print(acc_list)
+    
+    acc_length <- length(acc_list)
+    if(acc_length <= 1) {
+      dist_mean_func_df[window_index, "dist_mean"] <- NA
+    } else {
+      for(acc_index1 in 1:acc_length) {
+        for(acc_index2 in acc_index1:acc_length) {
+          dist_sum <- dist_matrix[acc_list[acc_index1], 
+                                    acc_list[acc_index2]] + dist_sum
+          if(acc_index1 != acc_index2)  {
+            dist_vec <- append(dist_vec, dist_matrix[acc_list[acc_index1], acc_list[acc_index2]])
+          }
+        }
+      }
+      print(dist_vec)
+      
+      number_pairwise_dist <- (acc_length*(acc_length-1))/2
+      mean <- dist_sum/number_pairwise_dist
+      dist_mean_func_df[window_index, "dist_mean"] <- mean
+      
+      dist_mean_func_df[window_index, "dist_std"] <- sd(unlist(dist_vec))
+      dist_mean_func_df[window_index, "num"] <- acc_length
+    }
+  }
+  return(dist_mean_func_df)
+}
+
+#################################################################################
+
 # Distances
+dist_mean_df <- data.frame("window" =  1:nrow(sliding_window), "num" = 0, "dist_mean" = 0, "dist_std" = 0, "start_date" = sliding_window$start_date)
 
 ## GER
-dist_mean_GER <- data.frame("window" =  1:nrow(sliding_window), "num" = 0, "dist_mean" = 0, "dist_std" = 0, "start_date" = sliding_window$start_date)
-violin_GER_df <- data.frame(matrix(ncol = 3, nrow = 0))
-
-for(window_index in 1:nrow(sliding_window)) {
-  dist_sum <- 0
-  dist_vec <- c()
-  acc_list <- c()
-  
-  for(acc_index0 in 1:nrow(meta_rsvB_GER)) {
-    if(meta_rsvB_GER$Accession[acc_index0] != RefSeq_rsvB & 
-       decimal_date(meta_rsvB_GER$Collection_Date[acc_index0]) >= sliding_window[window_index, "start_date"] & 
-       decimal_date(meta_rsvB_GER$Collection_Date[acc_index0]) <= sliding_window[window_index, "end_date"]) {
-      acc_list <- append(acc_list, meta_rsvB_GER$Accession[acc_index0])
-    }
-  }
-  print(window_index)
-  print(acc_list)
-  
-  acc_length <- length(acc_list)
-  if(acc_length <= 1) {
-    dist_mean_GER[window_index, "dist_mean"] <- NA
-  } else {
-    for(acc_index1 in 1:acc_length) {
-      for(acc_index2 in acc_index1:acc_length) {
-        dist_sum <- dist_rsvB_GER[acc_list[acc_index1], 
-                                      acc_list[acc_index2]] + dist_sum
-        if(acc_index1 != acc_index2)  {
-          dist_vec <- append(dist_vec, dist_rsvB_GER[acc_list[acc_index1], acc_list[acc_index2]])
-        }
-      }
-    }
-    print(dist_vec)
-    temp_df <- data.frame(matrix(ncol = 3, nrow = length(dist_vec)))
-    temp_df[,1] <- window_index
-    temp_df[,2] <- sliding_window[window_index, "start_date"]
-    temp_df[,3] <- dist_vec
-    
-    violin_GER_df <- rbind(violin_GER_df, temp_df)
-    
-    number_pairwise_dist <- (acc_length*(acc_length-1))/2
-    mean <- dist_sum/number_pairwise_dist
-    dist_mean_GER[window_index, "dist_mean"] <- mean
-    
-    dist_mean_GER[window_index, "dist_std"] <- sd(unlist(dist_vec))
-    dist_mean_GER[window_index, "num"] <- acc_length
-  }
-}
-
-colnames(violin_GER_df) <- c("window", "start_date", "dist")
-
-'ggplot(dist_mean_GER, aes(x = start_date, y = dist_mean)) +
-  geom_point() +
-  geom_errorbar(aes(ymin = dist_mean-dist_std, ymax = dist_mean+dist_std))
-
-ggplot(violin_GER_df, aes(x = as.factor(start_date), y = dist, colour = "red")) +
-  geom_violin()'
+dist_mean_GER <- sliding_window_func(dist_mean_func_df = dist_mean_df, EUGER = "GER")
 
 ## EU
-dist_mean_EU <- data.frame("window" =  1:nrow(sliding_window), "num" = 0, "dist_mean" = 0, "dist_std" = 0, "start_date" = sliding_window$start_date)
-violin_EU_df <- data.frame(matrix(ncol = 3, nrow = 0))
+dist_mean_EU <- sliding_window_func(dist_mean_func_df = dist_mean_df, EUGER = "EU")
 
-for(window_index in 1:nrow(sliding_window)) {
-  dist_sum <- 0
-  dist_vec <- c()
-  acc_list <- c()
-  for(acc_index0 in 1:nrow(meta_rsvB_EU)) {
-    if(meta_rsvB_EU$Accession[acc_index0] != RefSeq_rsvB & 
-       decimal_date(meta_rsvB_EU$Collection_Date[acc_index0]) >= sliding_window[window_index, "start_date"] & 
-       decimal_date(meta_rsvB_EU$Collection_Date[acc_index0]) <= sliding_window[window_index, "end_date"]) {
-      acc_list <- append(acc_list, meta_rsvB_EU$Accession[acc_index0])
-    }
-  }
-  print(window_index)
-  print(acc_list)
-  
-  acc_length <- length(acc_list)
-  if(acc_length <= 1) {
-    dist_mean_EU[window_index, "dist_mean"] <- NA
-  } else {
-    for(acc_index1 in 1:acc_length) {
-      for(acc_index2 in acc_index1:acc_length) {
-        dist_sum <- dist_rsvB_EU[acc_list[acc_index1], 
-                                    acc_list[acc_index2]] + dist_sum
-        if(acc_index1 != acc_index2)  { #dist_rsvB_EU[acc_list[acc_index1], acc_list[acc_index2]] != 0
-          dist_vec <- append(dist_vec, dist_rsvB_EU[acc_list[acc_index1], acc_list[acc_index2]])
-        }
-      }
-    }
-    number_pairwise_dist <- (acc_length*(acc_length-1))/2
-    mean <- dist_sum/number_pairwise_dist
-    dist_mean_EU[window_index, "dist_mean"] <- mean
-    
-    print(dist_vec)
-    
-    temp_df <- data.frame(matrix(ncol = 3, nrow = length(dist_vec)))
-    temp_df[,1] <- window_index
-    temp_df[,2] <- sliding_window[window_index, "start_date"]
-    temp_df[,3] <- dist_vec
-    
-    violin_EU_df <- rbind(violin_EU_df, temp_df)
-    
-    dist_mean_EU[window_index, "dist_std"] <- sd(unlist(dist_vec))
-    #sqrt(sum(unlist(lapply(dist_vec, function(x) (x - mean)**2)))/(number_pairwise_dist))
-    dist_mean_EU[window_index, "num"] <- acc_length
-  }
-}
-
-colnames(violin_EU_df) <- c("window", "start_date", "dist")
-  
-'ggplot(dist_mean_EU, aes(x = start_date, y = dist_mean)) + 
-  geom_point() +
-  geom_errorbar(aes(ymin = dist_mean-dist_std, ymax = dist_mean+dist_std))
-
-ggplot(violin_EU_df, aes(x = as.factor(window), y = dist)) +
-  geom_violin()'
+#################################################################################
 
 # Plot EU + GER
 ## Evo
@@ -245,52 +234,80 @@ sliding_window_plot <- ggplot(dist_mean_GER, aes(x = start_date, y = dist_mean))
   scale_y_continuous("distance (mean)", sec.axis = sec_axis(~.*1.33, name="sequence count"), limits = c(0, 300)) # IF NECESSARY ADJUST Y-AXIS
 sliding_window_plot
 
-# Violin Plot
+#################################################################################
 
-violin_GER_df$'EU/GER' <- "GER"
-violin_EU_df$'EU/GER' <- "EU"
+# Distance to Ref
 
-violin_GER_EU_df <- rbind(violin_GER_df, violin_EU_df)
-violin_GER_EU_df <- arrange(violin_GER_EU_df, window)
+refdist_rsvA_GER <- select(dist_rsvA_GER, contains(RefSeq_rsvA))
+refdist_rsvA_GER <- add_column(refdist_rsvA_GER, decimal_date(meta_rsvA_GER$Collection_Date))
+refdist_rsvA_GER <- refdist_rsvA_GER[-(which(is.na(refdist_rsvA_GER[,2]))),]
+colnames(refdist_rsvA_GER) <- c("Refdist", "Collection_Date")
+refdist_rsvA_GER$Window <- NA
 
-violin_df <- data.frame("window" = sliding_window$index)
-violin_df <- full_join(violin_df, violin_GER_EU_df, by = "window")
+refdist_rsvA_EU <- select(dist_rsvA_EU, contains(RefSeq_rsvA))
+refdist_rsvA_EU <- add_column(refdist_rsvA_EU, decimal_date(meta_rsvA_EU$Collection_Date))
+refdist_rsvA_EU <- refdist_rsvA_EU[-(which(is.na(refdist_rsvA_EU[,2]))),]
+colnames(refdist_rsvA_EU) <- c("Refdist", "Collection_Date")
+refdist_rsvA_EU$Window <- NA
 
-ggplot(violin_df, aes(x = factor(window), y = dist, fill = `EU/GER`, colour = `EU/GER`)) +
-  geom_violin() +
-  scale_colour_manual(values = c("GER" = "red", "EU" = "blue")) +
-  scale_fill_manual(values = c("GER" = "red", "EU" = "blue")) +
-  scale_x_discrete(guide = guide_axis(check.overlap = TRUE))
+## GER
+ggplot(refdist_rsvA_GER, aes(x = Collection_Date, y = Refdist)) +
+  geom_line()
 
-#########################################
-'# Assign window to collection date
-sliding_window_meta_rsvB <- subset(meta_rsvB, Accession != RefSeq_rsvB)
-sliding_window_meta_rsvB <- sliding_window_meta_rsvB[, c("Accession", "Country", "Collection_Date")]
-sliding_window_meta_rsvB$Collection_Date_dec <- decimal_date(sliding_window_meta_rsvB$Collection_Date)
-
-sliding_windows_index <- list()
-for(j in 1:(nrow(sliding_window_meta_rsvB))) {
-  sliding_windows_index[j] <- list(which(sliding_window_meta_rsvB$Collection_Date_dec[j] >= sliding_window$start_date & 
-                                           sliding_window_meta_rsvB$Collection_Date_dec[j] <= sliding_window$end_date))
-}
-
-for(n in 1:length(sliding_windows_index)) {
-  for(m in 1:length(sliding_windows_index[[n]])) {
-    sliding_windows_index[[n]][m] <- ifelse(as.integer(sliding_windows_index[[n]][m]) < 100, ifelse(as.integer(sliding_windows_index[[n]][m]) < 10, paste0(00, sliding_windows_index[[n]][m]), paste0(0, sliding_windows_index[[n]][m])), as.character(sliding_windows_index[[n]][m]))
+for(refdist_index in 1:nrow(refdist_rsvA_GER)) {
+  for(window_index in 1:nrow(sliding_window)) {
+    if(refdist_rsvA_GER[refdist_index, "Collection_Date"] >= sliding_window[window_index, "start_date"] &
+       refdist_rsvA_GER[refdist_index, "Collection_Date"] <= sliding_window[window_index, "end_date"]) {
+      refdist_rsvA_GER[refdist_index, "Window"] <- sliding_window[window_index, "index"]
+    }
   }
 }
 
-for(l in 1:(nrow(sliding_window_meta_rsvB))) {
-  window_temp <- ""
-  for(k in 1:length(sliding_windows_index[[l]])) {
-    window_temp <- paste(window_temp, sliding_windows_index[[l]][k], sep = "W")
-  }
-  sliding_window_meta_rsvB$Window[l] <- window_temp
+refdist_mean_GER <- data.frame("Window" =  1:nrow(sliding_window))
+
+refdist_mean_GER_t <- full_join(refdist_mean_GER, refdist_rsvA_GER, by = "Window")
+
+ggplot(refdist_mean_GER_t, aes(x = Window, y = Refdist)) +
+  geom_point()
+
+refdist_mean_GER_mean <- data.frame("Window" =  1:nrow(sliding_window), "mean" = NA, "std" = NA)
+
+for(win_index in 1:nrow(refdist_mean_GER_mean)) {
+  refdist_mean_GER_mean$mean[win_index] <- mean(refdist_mean_GER_t$Refdist[which(refdist_mean_GER_t$Window == win_index)])
+  refdist_mean_GER_mean$std[win_index] <- sd(refdist_mean_GER_t$Refdist[which(refdist_mean_GER_t$Window == win_index)])
 }
 
-RefA_df <- data.frame("Accession" = RefSeq_rsvB, "Country" = NA, "Collection_Date" = NA, 
-                      "Collection_Date_dec" = NA, "Window" = NA,
-                      stringsAsFactors = FALSE)
+ggplot(refdist_mean_GER_mean, aes(x = Window, y = mean)) + 
+  geom_point() +
+  geom_errorbar(aes(ymin = mean-std, ymax = mean+std))
 
-sliding_window_meta_rsvB_GER <- sliding_window_meta_rsvB %>% subset(Country == "Germany") %>% rbind(RefA_df) %>% arrange(Accession)
-sliding_window_meta_rsvB_EU <- sliding_window_meta_rsvB %>% subset(Country != "Germany") %>% rbind(RefA_df) %>% arrange(Accession)'
+## EU
+ggplot(refdist_rsvA_EU, aes(x = Collection_Date, y = Refdist)) +
+  geom_line()
+
+for(refdist_index in 1:nrow(refdist_rsvA_EU)) {
+  for(window_index in 1:nrow(sliding_window)) {
+    if(refdist_rsvA_EU[refdist_index, "Collection_Date"] >= sliding_window[window_index, "start_date"] &
+       refdist_rsvA_EU[refdist_index, "Collection_Date"] <= sliding_window[window_index, "end_date"]) {
+      refdist_rsvA_EU[refdist_index, "Window"] <- sliding_window[window_index, "index"]
+    }
+  }
+}
+
+refdist_mean_EU <- data.frame("Window" =  1:nrow(sliding_window))
+
+refdist_mean_EU_t <- full_join(refdist_mean_EU, refdist_rsvA_EU, by = "Window")
+
+ggplot(refdist_mean_EU_t, aes(x = Window, y = Refdist)) +
+  geom_point()
+
+refdist_mean_EU_mean <- data.frame("Window" =  1:nrow(sliding_window), "mean" = NA, "std" = NA)
+
+for(win_index in 1:nrow(refdist_mean_EU_mean)) {
+  refdist_mean_EU_mean$mean[win_index] <- mean(refdist_mean_EU_t$Refdist[which(refdist_mean_EU_t$Window == win_index)])
+  refdist_mean_EU_mean$std[win_index] <- sd(refdist_mean_EU_t$Refdist[which(refdist_mean_EU_t$Window == win_index)])
+}
+
+ggplot(refdist_mean_EU_mean, aes(x = Window, y = mean)) + 
+  geom_point() +
+  geom_errorbar(aes(ymin = mean-std, ymax = mean+std))
