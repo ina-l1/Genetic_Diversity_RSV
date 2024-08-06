@@ -28,22 +28,16 @@ meta_rsvB <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvB_ref_met
 meta_rsvA$Collection_Date <- as.Date(meta_rsvA$Collection_Date, format = "%Y-%m-%d") #%m/%d/%Y
 meta_rsvB$Collection_Date <- as.Date(meta_rsvB$Collection_Date, format = "%Y-%m-%d")
 
-meta_rsvA$Collection_YearWeek <- paste(meta_rsvA$MMWRyear, 
-                                       ifelse(meta_rsvA$MMWRweek < 10, paste0("0", meta_rsvA$MMWRweek), meta_rsvA$MMWRweek), 
-                                       sep = "/")
-meta_rsvB$Collection_YearWeek <- paste(meta_rsvB$MMWRyear, 
-                                       ifelse(meta_rsvB$MMWRweek < 10, paste0("0", meta_rsvB$MMWRweek), meta_rsvB$MMWRweek), 
-                                       sep = "/")
 RefSeq_rsvA <- "NC_038235.1"
 RefSeq_rsvB <- "NC_001781.1"
 
 ## German sequences
 meta_rsvA_GER <- subset(meta_rsvA, Country == "Germany" | Accession == RefSeq_rsvA) #same as NCBI_rsvA_wgs_germany_2015.csv
-meta_rsvB_GER <- subset(meta_rsvB, Country == "Germany"| Accession == RefSeq_rsvB) #same as NCBI_rsvB_wgs_germany_2015.csv
+meta_rsvB_GER <- subset(meta_rsvB, Country == "Germany" | Accession == RefSeq_rsvB) #same as NCBI_rsvB_wgs_germany_2015.csv
 
 ## Non-German EU sequences
-meta_rsvA_EU <- subset(meta_rsvA, Country != "Germany"| Accession == RefSeq_rsvA)
-meta_rsvB_EU <- subset(meta_rsvB, Country != "Germany"| Accession == RefSeq_rsvB)
+meta_rsvA_EU <- subset(meta_rsvA, Country != "Germany" | Accession == RefSeq_rsvA)
+meta_rsvB_EU <- subset(meta_rsvB, Country != "Germany" | Accession == RefSeq_rsvB)
 
 #################################################################################
 

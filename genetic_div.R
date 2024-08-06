@@ -17,8 +17,8 @@ library(phangorn) #https://cran.r-project.org/web/packages/phangorn/phangorn.pdf
 meta_rsvA <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvA_ref_metadata_EU.csv")
 meta_rsvB <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvB_ref_metadata_EU.csv")
 
-aln_rsvA <- read.FASTA("~/Yale_Projects/Genetic_Diversity_RSV/Europe/Sequences/rsvA_MAFFT_alignment_EU.fasta")
-aln_rsvB <- read.FASTA("~/Yale_Projects/Genetic_Diversity_RSV/Europe/Sequences/rsvB_MAFFT_alignment_EU.fasta")
+aln_rsvA <- read.FASTA("~/Yale_Projects/Genetic_Diversity_RSV/Europe/Sequences/rsvA_MAFFT_alignment_EU_noGer.fasta")
+aln_rsvB <- read.FASTA("~/Yale_Projects/Genetic_Diversity_RSV/Europe/Sequences/rsvB_MAFFT_alignment_EU_noGer.fasta")
 
 RefSeq_rsvA <- "NC_038235.1"
 RefSeq_rsvB <- "NC_001781.1"
@@ -51,8 +51,8 @@ evo_dist_rsvB <- dist.dna(aln_rsvB, model = "TN93",
                       pairwise.deletion = FALSE,
                       as.matrix = TRUE)
 
-write.csv(evo_dist_rsvA, file = "~/Yale_Projects/Genetic_Diversity_RSV/Europe/evodist_rsvA_EU.csv")
-write.csv(evo_dist_rsvB, file = "~/Yale_Projects/Genetic_Diversity_RSV/Europe/evodist_rsvB_EU.csv")
+write.csv(evo_dist_rsvA, file = "~/Yale_Projects/Genetic_Diversity_RSV/Europe/evodist_rsvA_EU_noGer.csv")
+write.csv(evo_dist_rsvB, file = "~/Yale_Projects/Genetic_Diversity_RSV/Europe/evodist_rsvB_EU_noGer.csv")
 
 # SNP distance with snp-dists
 
@@ -65,15 +65,14 @@ rownames(snp_dist_rsvB) <- snp_dist_rsvB[, 1]
 snp_dist_rsvB <- snp_dist_rsvB[, -1]
 
 # Hamming Distance
-# use dist.hamming?
-
+'
 ham_dist_rsvA <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/snpdist_rsvA_protein.csv")
 rownames(ham_dist_rsvA) <- ham_dist_rsvA[, 1]
 ham_dist_rsvA <- ham_dist_rsvA[, -1]
 
 ham_dist_rsvB <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/snpdist_rsvB_protein.csv")
 rownames(ham_dist_rsvB) <- ham_dist_rsvB[, 1]
-ham_dist_rsvB <- ham_dist_rsvB[, -1]
+ham_dist_rsvB <- ham_dist_rsvB[, -1]'
 
 # Classic multidimensional scaling (MDS)
 

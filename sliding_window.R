@@ -7,13 +7,13 @@
 library(dplyr)
 library(tidyr)
 library(stringr)
-library(tibble)
 library(ggplot2)
-library(plotly)
-library(adegenet)
-library(usedist)
 library(lubridate)
 library(MMWRweek)
+
+#library(plotly)
+#library(adegenet)
+#library(usedist)
 
 #################################################################################
 
@@ -25,22 +25,16 @@ meta_rsvB <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvB_ref_met
 meta_rsvA$Collection_Date <- as.Date(meta_rsvA$Collection_Date, format = "%Y-%m-%d") #%m/%d/%Y
 meta_rsvB$Collection_Date <- as.Date(meta_rsvB$Collection_Date, format = "%Y-%m-%d")
 
-meta_rsvA$Collection_YearWeek <- paste(meta_rsvA$MMWRyear, 
-                                       ifelse(meta_rsvA$MMWRweek < 10, paste0("0", meta_rsvA$MMWRweek), meta_rsvA$MMWRweek), 
-                                       sep = "/")
-meta_rsvB$Collection_YearWeek <- paste(meta_rsvB$MMWRyear, 
-                                       ifelse(meta_rsvB$MMWRweek < 10, paste0("0", meta_rsvB$MMWRweek), meta_rsvB$MMWRweek), 
-                                       sep = "/")
 RefSeq_rsvA <- "NC_038235.1"
 RefSeq_rsvB <- "NC_001781.1"
 
 ## German sequences
 meta_rsvA_GER <- subset(meta_rsvA, Country == "Germany" | Accession == RefSeq_rsvA) #same as NCBI_rsvA_wgs_germany_2015.csv
-meta_rsvB_GER <- subset(meta_rsvB, Country == "Germany"| Accession == RefSeq_rsvB) #same as NCBI_rsvB_wgs_germany_2015.csv
+meta_rsvB_GER <- subset(meta_rsvB, Country == "Germany" | Accession == RefSeq_rsvB) #same as NCBI_rsvB_wgs_germany_2015.csv
 
 ## Non-German EU sequences
-meta_rsvA_EU <- subset(meta_rsvA, Country != "Germany"| Accession == RefSeq_rsvA)
-meta_rsvB_EU <- subset(meta_rsvB, Country != "Germany"| Accession == RefSeq_rsvB)
+meta_rsvA_EU <- subset(meta_rsvA, Country != "Germany" | Accession == RefSeq_rsvA)
+meta_rsvB_EU <- subset(meta_rsvB, Country != "Germany" | Accession == RefSeq_rsvB)
 
 #################################################################################
 
@@ -86,12 +80,12 @@ for(i in 1:(nrow(dates_df)-(sliding_window_size - 1))) {
 # RSV-A and RSV-B: Replace rsvA/rsvB
 # Diversity Measures: Replace snpdist/evodist/hamdist
 
-rsvAB_choose <- "rsvA" ##
+rsvAB_choose <- "rsvB" ##
 
-dist_rsvA_GER <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Germany/evodist_rsvA.csv") ##
-dist_rsvA_EU <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/evodist_rsvA_EU_noGer.csv") ##
-dist_rsvB_GER <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Germany/evodist_rsvB.csv") ##
-dist_rsvB_EU <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/evodist_rsvB_EU_noGer.csv") ##
+dist_rsvA_GER <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Germany/snpdist_rsvA.csv") ##
+dist_rsvA_EU <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/snpdist_rsvA_EU_noGer.csv") ##
+dist_rsvB_GER <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Germany/snpdist_rsvB.csv") ##
+dist_rsvB_EU <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/snpdist_rsvB_EU_noGer.csv") ##
 
 dist_matrix_func <- function(distance_matrix) {
   distance_matrix <- arrange(distance_matrix, distance_matrix[,1])
