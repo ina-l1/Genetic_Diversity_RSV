@@ -1,5 +1,6 @@
 # Validating temporal genetic diversity pattern of German sequences
 # Countries: Netherlands, Spain, UK
+# All included EU countries: Austria, Finland, France, Germany, Italy, Netherlands, Russia, Spain, United Kingdom 
 
 library(dplyr)
 library(tidyr)
@@ -17,15 +18,15 @@ rsvAB_choose <- "rsvB" ##
 meta_rsvA <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvA_ref_metadata_EU.csv") #already in alphabetical order
 meta_rsvB <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvB_ref_metadata_EU.csv")
 
-meta_rsvA$Collection_Date <- as.Date(meta_rsvA$Collection_Date, format = "%Y-%m-%d") #%m/%d/%Y
-meta_rsvB$Collection_Date <- as.Date(meta_rsvB$Collection_Date, format = "%Y-%m-%d")
+meta_rsvA$Collection_Date <- as_date(meta_rsvA$Collection_Date) 
+meta_rsvB$Collection_Date <- as_date(meta_rsvB$Collection_Date)
 
 RefSeq_rsvA <- "NC_038235.1"
 RefSeq_rsvB <- "NC_001781.1"
 
-## Germany (GER)
-meta_rsvA_GER <- subset(meta_rsvA, Country == "Germany" | Accession == RefSeq_rsvA) #same as NCBI_rsvA_wgs_germany_2015.csv
-meta_rsvB_GER <- subset(meta_rsvB, Country == "Germany" | Accession == RefSeq_rsvB) #same as NCBI_rsvB_wgs_germany_2015.csv
+## Germany (DEU)
+meta_rsvA_DEU <- subset(meta_rsvA, Country == "Germany" | Accession == RefSeq_rsvA) #same as NCBI_rsvA_wgs_germany_2015.csv
+meta_rsvB_DEU <- subset(meta_rsvB, Country == "Germany" | Accession == RefSeq_rsvB) #same as NCBI_rsvB_wgs_germany_2015.csv
 
 ## Netherlands (NLD)
 meta_rsvA_NLD <- subset(meta_rsvA, Country == "Netherlands" | Accession == RefSeq_rsvA)
@@ -78,12 +79,12 @@ for(i in 1:(nrow(dates_df)-(sliding_window_size - 1))) {
 
 #################################################################################
 
-dist_rsvA_GER <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Germany/evodist_rsvA.csv") ##
+dist_rsvA_DEU <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Germany/evodist_rsvA.csv") ##
 dist_rsvA_NLD <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/evodist_rsvA_netherlands.csv") ##
 dist_rsvA_ESP <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/evodist_rsvA_spain.csv") ##
 dist_rsvA_GBR <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/evodist_rsvA_UK.csv") ##
 
-dist_rsvB_GER <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Germany/evodist_rsvB.csv") ##
+dist_rsvB_DEU <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Germany/evodist_rsvB.csv") ##
 dist_rsvB_NLD <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/evodist_rsvB_netherlands.csv") ##
 dist_rsvB_ESP <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/evodist_rsvB_spain.csv") ##
 dist_rsvB_GBR <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/evodist_rsvB_UK.csv") ##
@@ -94,8 +95,8 @@ dist_matrix_func <- function(distance_matrix) {
   distance_matrix <- distance_matrix %>% select(order(colnames(.)))
 }
 
-dist_rsvA_GER <- dist_matrix_func(distance_matrix = dist_rsvA_GER)
-dist_rsvB_GER <- dist_matrix_func(distance_matrix = dist_rsvB_GER)
+dist_rsvA_DEU <- dist_matrix_func(distance_matrix = dist_rsvA_DEU)
+dist_rsvB_DEU <- dist_matrix_func(distance_matrix = dist_rsvB_DEU)
 
 dist_rsvA_NLD <- dist_matrix_func(distance_matrix = dist_rsvA_NLD)
 dist_rsvB_NLD <- dist_matrix_func(distance_matrix = dist_rsvB_NLD)
@@ -106,8 +107,8 @@ dist_rsvB_ESP <- dist_matrix_func(distance_matrix = dist_rsvB_ESP)
 dist_rsvA_GBR <- dist_matrix_func(distance_matrix = dist_rsvA_GBR)
 dist_rsvB_GBR <- dist_matrix_func(distance_matrix = dist_rsvB_GBR)
 
-rownames(dist_rsvA_GER) <- meta_rsvA_GER$Accession
-colnames(dist_rsvA_GER) <- meta_rsvA_GER$Accession
+rownames(dist_rsvA_DEU) <- meta_rsvA_DEU$Accession
+colnames(dist_rsvA_DEU) <- meta_rsvA_DEU$Accession
 
 rownames(dist_rsvA_NLD) <- meta_rsvA_NLD$Accession
 colnames(dist_rsvA_NLD) <- meta_rsvA_NLD$Accession
@@ -118,8 +119,8 @@ colnames(dist_rsvA_ESP) <- meta_rsvA_ESP$Accession
 rownames(dist_rsvA_GBR) <- meta_rsvA_GBR$Accession
 colnames(dist_rsvA_GBR) <- meta_rsvA_GBR$Accession
 
-rownames(dist_rsvB_GER) <- meta_rsvB_GER$Accession
-colnames(dist_rsvB_GER) <- meta_rsvB_GER$Accession
+rownames(dist_rsvB_DEU) <- meta_rsvB_DEU$Accession
+colnames(dist_rsvB_DEU) <- meta_rsvB_DEU$Accession
 
 rownames(dist_rsvB_NLD) <- meta_rsvB_NLD$Accession
 colnames(dist_rsvB_NLD) <- meta_rsvB_NLD$Accession
@@ -133,34 +134,34 @@ colnames(dist_rsvB_GBR) <- meta_rsvB_GBR$Accession
 #################################################################################
 
 if(rsvAB_choose == "rsvA") {
-  dist_rsvAB_GER <- dist_rsvA_GER
+  dist_rsvAB_DEU <- dist_rsvA_DEU
   dist_rsvAB_GBR <- dist_rsvA_GBR
   RefSeq <- RefSeq_rsvA
   
 } else {
-  dist_rsvAB_GER <- dist_rsvB_GER
+  dist_rsvAB_DEU <- dist_rsvB_DEU
   dist_rsvAB_GBR <- dist_rsvB_GBR
   RefSeq <- RefSeq_rsvB
 }
 
 # Sliding window function
 
-sliding_window_func <- function(dist_mean_func_df, GBRGER) {
+sliding_window_func <- function(dist_mean_func_df, GBRDEU) {
   
-  if(GBRGER == "GER" & rsvAB_choose == "rsvA"){
-    meta <- meta_rsvA_GER
-    dist_matrix <- dist_rsvAB_GER
-  } else if(GBRGER == "GBR" & rsvAB_choose == "rsvA") {
+  if(GBRDEU == "DEU" & rsvAB_choose == "rsvA"){
+    meta <- meta_rsvA_DEU
+    dist_matrix <- dist_rsvAB_DEU
+  } else if(GBRDEU == "GBR" & rsvAB_choose == "rsvA") {
     meta <- meta_rsvA_GBR
     dist_matrix <- dist_rsvAB_GBR
-  } else if(GBRGER == "GER" & rsvAB_choose == "rsvB") {
-    meta <- meta_rsvB_GER
-    dist_matrix <- dist_rsvAB_GER
-  } else if(GBRGER == "GBR" & rsvAB_choose == "rsvB") {
+  } else if(GBRDEU == "DEU" & rsvAB_choose == "rsvB") {
+    meta <- meta_rsvB_DEU
+    dist_matrix <- dist_rsvAB_DEU
+  } else if(GBRDEU == "GBR" & rsvAB_choose == "rsvB") {
     meta <- meta_rsvB_GBR
     dist_matrix <- dist_rsvAB_GBR
   } else {
-    print("invalid arguments: Choose GER or GBR.")
+    print("invalid arguments: Choose DEU or GBR.")
   }
   
   for(window_index in 1:nrow(sliding_window)) {
@@ -209,16 +210,16 @@ sliding_window_func <- function(dist_mean_func_df, GBRGER) {
 # Distances
 dist_mean_df <- data.frame("window" =  1:nrow(sliding_window), "num" = 0, "dist_mean" = 0, "dist_std" = 0, "start_date" = sliding_window$start_date)
 
-## GER
-dist_mean_GER <- sliding_window_func(dist_mean_func_df = dist_mean_df, GBRGER = "GER")
+## DEU
+dist_mean_DEU <- sliding_window_func(dist_mean_func_df = dist_mean_df, GBRDEU = "DEU")
 
 ## GBR
-dist_mean_GBR <- sliding_window_func(dist_mean_func_df = dist_mean_df, GBRGER = "GBR")
+dist_mean_GBR <- sliding_window_func(dist_mean_func_df = dist_mean_df, GBRDEU = "GBR")
 
 #################################################################################
 
 ## Evo
-sliding_window_plot <- ggplot(dist_mean_GER, aes(x = start_date, y = dist_mean)) +
+sliding_window_plot <- ggplot(dist_mean_DEU, aes(x = start_date, y = dist_mean)) +
   geom_errorbar(data = dist_mean_GBR, aes(ymin = dist_mean-dist_std, ymax = dist_mean+dist_std), colour = "lightgrey") +
   geom_errorbar(aes(ymin = dist_mean-dist_std, ymax = dist_mean+dist_std), colour = "black", alpha = 0.45) +
   geom_point(colour = "red") +
@@ -232,7 +233,7 @@ sliding_window_plot <- ggplot(dist_mean_GER, aes(x = start_date, y = dist_mean))
 sliding_window_plot
 
 ## SNP
-sliding_window_plot <- ggplot(dist_mean_GER, aes(x = start_date, y = dist_mean)) +
+sliding_window_plot <- ggplot(dist_mean_DEU, aes(x = start_date, y = dist_mean)) +
   geom_errorbar(data = dist_mean_GBR, aes(ymin = dist_mean-dist_std, ymax = dist_mean+dist_std), colour = "lightgrey") +
   geom_errorbar(aes(ymin = dist_mean-dist_std, ymax = dist_mean+dist_std), colour = "black", alpha = 0.45) +
   geom_point(colour = "red") +

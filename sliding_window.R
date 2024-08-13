@@ -22,8 +22,8 @@ library(MMWRweek)
 meta_rsvA <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvA_ref_metadata_EU.csv") #already in alphabetical order
 meta_rsvB <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvB_ref_metadata_EU.csv")
 
-meta_rsvA$Collection_Date <- as.Date(meta_rsvA$Collection_Date, format = "%Y-%m-%d") #%m/%d/%Y
-meta_rsvB$Collection_Date <- as.Date(meta_rsvB$Collection_Date, format = "%Y-%m-%d")
+meta_rsvA$Collection_Date <- as_date(meta_rsvA$Collection_Date) 
+meta_rsvB$Collection_Date <- as_date(meta_rsvB$Collection_Date)
 
 RefSeq_rsvA <- "NC_038235.1"
 RefSeq_rsvB <- "NC_001781.1"

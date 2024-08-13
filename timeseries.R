@@ -1,28 +1,64 @@
-# Data visualization: Time series
+# Data visualization
+# Sequence count (GenBank) and case count (WHO FluNet) 
 
 library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(lubridate)
 
-# Read metadata
+#################################################################################
+
+# Sequence count: Read metadata
+
 rsvAB <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Germany/rsvAB_metadata_GER.csv", row.names = 1)
-rsvAB$Collection_Date <- as.Date(rsvAB$Collection_Date, format = "%Y-%m-%d") #%m/%d/%Y
-rsvAB$Date_round <- floor_date(rsvAB$Collection_Date, "week")
+rsvAB$Collection_Date <- as_date(rsvAB$Collection_Date)
+rsvAB$MMWR_start_date <- MMWRweek2Date(MMWRyear = rsvAB$MMWRyear, MMWRweek = rsvAB$MMWRweek)
 
 rsvAB_EU <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvAB_metadata_EU.csv", row.names = 1)
-rsvAB_EU$Collection_Date <- as.Date(rsvAB_EU$Collection_Date, format = "%Y-%m-%d") #%m/%d/%Y
-rsvAB_EU$Date_round <- floor_date(rsvAB_EU$Collection_Date, "week")
+rsvAB_EU$Collection_Date <- as_date(rsvAB_EU$Collection_Date)
+rsvAB$MMWR_start_date <- MMWRweek2Date(MMWRyear = rsvAB$MMWRyear, MMWRweek = rsvAB$MMWRweek)
 
 rsvAB_EU$'EU/GER' <- ifelse(rsvAB_EU$Country == "Germany", "GER", "EU")
 
-#rsvAB_EU <- subset(rsvAB_EU, Country != "Germany")
+rsvAB_EU_noGer <- subset(rsvAB_EU, Country != "Germany")
 
-# Number of sequences per season
+#################################################################################
+
+# Case count: Read metadata
+
+start_date <- MMWRweek2Date(2014, 40)
+end_date <- MMWRweek2Date(2023, 39) #Most recent sequence data available from 2022/2023 season
+
+case_flunet <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/VIW_FNT.csv")
+case_flunet$ISO_WEEKSTARTDATE <- as_date(case_flunet$ISO_WEEKSTARTDATE)
+case_flunet$MMWR_WEEKSTARTDATE <- as_date(case_flunet$MMWR_WEEKSTARTDATE)
+
+case_DEU <- case_flunet %>% subset(COUNTRY_CODE == "DEU") %>% 
+  subset(select = c(COUNTRY_CODE, COUNTRY_AREA_TERRITORY, ISO_WEEKSTARTDATE, ISO_YEAR, ISO_WEEK, MMWR_WEEKSTARTDATE, MMWR_YEAR, MMWR_WEEK, RSV, MMWRYW, ISOYW)) %>%
+  subset(MMWR_WEEKSTARTDATE >= start_date & MMWR_WEEKSTARTDATE <= end_date)
+
+case_NLD <- case_flunet %>% subset(COUNTRY_CODE == "NLD") %>% 
+  subset(select = c(COUNTRY_CODE, COUNTRY_AREA_TERRITORY, ISO_WEEKSTARTDATE, ISO_YEAR, ISO_WEEK, MMWR_WEEKSTARTDATE, MMWR_YEAR, MMWR_WEEK, RSV, MMWRYW, ISOYW)) %>%
+  subset(MMWR_WEEKSTARTDATE >= start_date & MMWR_WEEKSTARTDATE <= end_date)
+
+case_ESP <- case_flunet %>% subset(COUNTRY_CODE == "ESP") %>% 
+  subset(select = c(COUNTRY_CODE, COUNTRY_AREA_TERRITORY, ISO_WEEKSTARTDATE, ISO_YEAR, ISO_WEEK, MMWR_WEEKSTARTDATE, MMWR_YEAR, MMWR_WEEK, RSV, MMWRYW, ISOYW)) %>%
+  subset(MMWR_WEEKSTARTDATE >= start_date & MMWR_WEEKSTARTDATE <= end_date)
+
+case_EU <- case_flunet %>% subset(COUNTRY_CODE == "AUT" | COUNTRY_CODE == "FIN" | COUNTRY_CODE == "FRA" | COUNTRY_CODE == "ITA" |
+                                    COUNTRY_CODE == "NLD" | COUNTRY_CODE == "RUS" | COUNTRY_CODE == "ESP" | COUNTRY_CODE == "X09") %>% 
+  subset(select = c(COUNTRY_CODE, COUNTRY_AREA_TERRITORY, ISO_WEEKSTARTDATE, ISO_YEAR, ISO_WEEK, MMWR_WEEKSTARTDATE, MMWR_YEAR, MMWR_WEEK, RSV, MMWRYW, ISOYW)) %>%
+  subset(MMWR_WEEKSTARTDATE >= start_date & MMWR_WEEKSTARTDATE <= end_date) #GenBank sequences only available for these countries
+
+#################################################################################
+
+# Sequence count (GenBank)
+
 tab_rsvAB_season <- as.data.frame.matrix(table(rsvAB$Collection_Season, rsvAB$Type))
 tab_rsvAB_EU_season <- as.data.frame.matrix(table(rsvAB_EU$Collection_Season, rsvAB_EU$Type))
 
 # Time series
+
 timeseries_plot <- ggplot(rsvAB, aes(x = Collection_Date, color = Type, fill = Type))+
   geom_histogram(binwidth = 7)+
   scale_x_date(
@@ -45,9 +81,45 @@ timeseries_stack_plot
 
 #EU + GER
 ggplot() +
-  geom_bar(data = rsvAB_EU, aes(x = Date_round)) +
+  geom_bar(data = rsvAB_EU, aes(x = MMWR_start_date)) +
   geom_bar(data = rsvAB, aes(x = Date_round, fill = Type)) +
   scale_fill_manual(values = c("red", "blue")) +
   xlab(label = "collection year") +
   ylab(label = "sequence count") +
   theme_minimal()
+
+#################################################################################
+
+# Case count (FluNet)
+
+case_count_DEU <- aggregate(RSV ~ MMWR_WEEKSTARTDATE, data = case_DEU, sum)
+case_count_NLD <- aggregate(RSV ~ MMWR_WEEKSTARTDATE, data = case_NLD, sum)
+case_count_ESP <- aggregate(RSV ~ MMWR_WEEKSTARTDATE, data = case_ESP, sum)
+case_count_EU <- aggregate(RSV ~ MMWR_WEEKSTARTDATE, data = case_EU, sum)
+
+ggplot(case_count_DEU, aes(x = MMWR_WEEKSTARTDATE, y = RSV)) +
+  geom_bar(stat = "identity") +
+  scale_x_date(
+    date_breaks = "1 year",
+    date_labels = "%Y"
+  ) +
+  xlab("year") +
+  ylab("RSV case count")
+
+#################################################################################
+
+# Seq vs case count
+
+seq_count_DEU <- as.data.frame(table(rsvAB$MMWR_start_date))
+colnames(seq_count_DEU) <- c("MMWR_start_date", "count")
+seq_count_DEU$MMWR_start_date <- as_date(seq_count_DEU$MMWR_start_date)
+
+ggplot() +
+  geom_bar(data = case_count_DEU, aes(x = MMWR_WEEKSTARTDATE, y = RSV), stat = "identity", fill = "pink") +
+  geom_bar(data = seq_count_DEU, aes(x = MMWR_start_date, y = count), stat = "identity", fill = "darkgreen") +
+  scale_x_date(
+    date_breaks = "1 year",
+    date_labels = "%Y"
+  ) +
+  xlab("year") +
+  ylab("RSV sequence count")
