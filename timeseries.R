@@ -5,6 +5,7 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(lubridate)
+library(MMWRweek)
 
 #################################################################################
 
@@ -16,11 +17,21 @@ rsvAB$MMWR_start_date <- MMWRweek2Date(MMWRyear = rsvAB$MMWRyear, MMWRweek = rsv
 
 rsvAB_EU <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvAB_metadata_EU.csv", row.names = 1)
 rsvAB_EU$Collection_Date <- as_date(rsvAB_EU$Collection_Date)
-rsvAB$MMWR_start_date <- MMWRweek2Date(MMWRyear = rsvAB$MMWRyear, MMWRweek = rsvAB$MMWRweek)
+rsvAB_EU$MMWR_start_date <- MMWRweek2Date(MMWRyear = rsvAB_EU$MMWRyear, MMWRweek = rsvAB_EU$MMWRweek)
 
 rsvAB_EU$'EU/GER' <- ifelse(rsvAB_EU$Country == "Germany", "GER", "EU")
 
 rsvAB_EU_noGer <- subset(rsvAB_EU, Country != "Germany")
+
+rsvAB_ESP <- subset(rsvAB_EU, Country == "Spain")
+
+seq_count_DEU <- as.data.frame(table(rsvAB$MMWR_start_date))
+colnames(seq_count_DEU) <- c("MMWR_start_date", "count")
+seq_count_DEU$MMWR_start_date <- as_date(seq_count_DEU$MMWR_start_date)
+
+seq_count_ESP <- as.data.frame(table(rsvAB_ESP$MMWR_start_date))
+colnames(seq_count_ESP) <- c("MMWR_start_date", "count")
+seq_count_ESP$MMWR_start_date <- as_date(seq_count_ESP$MMWR_start_date)
 
 #################################################################################
 
@@ -72,7 +83,7 @@ timeseries_plot <- ggplot(rsvAB, aes(x = Collection_Date, color = Type, fill = T
 timeseries_plot
 
 timeseries_stack_plot <- ggplot() +
-  geom_bar(data = rsvAB, aes(x = Date_round, fill = Type)) +
+  geom_bar(data = rsvAB, aes(x = MMWR_start_date, fill = Type)) +
   scale_fill_manual(values = c("red", "blue")) +
   xlab(label = "collection year") +
   ylab(label = "sequence count") +
@@ -82,7 +93,7 @@ timeseries_stack_plot
 #EU + GER
 ggplot() +
   geom_bar(data = rsvAB_EU, aes(x = MMWR_start_date)) +
-  geom_bar(data = rsvAB, aes(x = Date_round, fill = Type)) +
+  geom_bar(data = rsvAB, aes(x = MMWR_start_date, fill = Type)) +
   scale_fill_manual(values = c("red", "blue")) +
   xlab(label = "collection year") +
   ylab(label = "sequence count") +
@@ -110,13 +121,19 @@ ggplot(case_count_DEU, aes(x = MMWR_WEEKSTARTDATE, y = RSV)) +
 
 # Seq vs case count
 
-seq_count_DEU <- as.data.frame(table(rsvAB$MMWR_start_date))
-colnames(seq_count_DEU) <- c("MMWR_start_date", "count")
-seq_count_DEU$MMWR_start_date <- as_date(seq_count_DEU$MMWR_start_date)
+ggplot() +
+  geom_line(data = case_count_DEU, aes(x = MMWR_WEEKSTARTDATE, y = RSV), colour = "orange") +
+  geom_line(data = seq_count_DEU, aes(x = MMWR_start_date, y = count), colour = "darkgreen") +
+  scale_x_date(
+    date_breaks = "1 year",
+    date_labels = "%Y"
+  ) +
+  xlab("year") +
+  ylab("RSV sequence count")
 
 ggplot() +
-  geom_bar(data = case_count_DEU, aes(x = MMWR_WEEKSTARTDATE, y = RSV), stat = "identity", fill = "pink") +
-  geom_bar(data = seq_count_DEU, aes(x = MMWR_start_date, y = count), stat = "identity", fill = "darkgreen") +
+  geom_line(data = case_count_ESP, aes(x = MMWR_WEEKSTARTDATE, y = RSV), colour = "orange") +
+  geom_line(data = seq_count_ESP, aes(x = MMWR_start_date, y = count), colour = "darkgreen") +
   scale_x_date(
     date_breaks = "1 year",
     date_labels = "%Y"
