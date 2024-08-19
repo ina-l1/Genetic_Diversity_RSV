@@ -7,6 +7,7 @@ library(scales)
 library(ape)
 library(treeio)
 library(ggtree)
+library(lubridate)
 
 # Metadata
 RefSeq_rsvA <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/RefSeq/RefSeq_rsvA.csv")
@@ -15,8 +16,8 @@ RefSeq_rsvB <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/RefSeq/RefSeq_rsv
 rsvA_ref <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvA_ref_metadata_EU.csv")
 rsvB_ref <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvB_ref_metadata_EU.csv")
 
-rsvA_ref$Collection_Date <- as.Date(rsvA_ref$Collection_Date, format = "%Y-%m-%d") #%m/%d/%Y
-rsvB_ref$Collection_Date <- as.Date(rsvB_ref$Collection_Date, format = "%Y-%m-%d") #%m/%d/%Y
+rsvA_ref$Collection_Date <- as_date(rsvA_ref$Collection_Date) 
+rsvB_ref$Collection_Date <- as_date(rsvB_ref$Collection_Date) 
 
 rsvA_ref <- subset(rsvA_ref, Accession != "NC_038235.1") ###
 rsvB_ref <- subset(rsvB_ref, Accession != "NC_001781.1") ###
@@ -26,7 +27,7 @@ rsvB_ref$'EU/GER' <- ifelse(rsvB_ref$Country == "Germany", "GER", "EU") ###
 # Tree visualization: RSV A
 
 #tree_A <- read.tree("~/Yale_Projects/Genetic_Diversity_RSV/Europe/Treefiles/tree_rsvA_MAFFT_alignment_EU.treefile") #read.nexus for NEXUS format, read.tree for Newick format
-tree_A <- read.tree("~/Yale_Projects/Genetic_Diversity_RSV/BEAST/tree_rsvA_EU.tre") 
+tree_A <- read.tree("~/Yale_Projects/Genetic_Diversity_RSV/BEAST/tree_files/tree_rsA_EU.trees") 
 
 treelabel_A <- tree_A$tip.label
 treelabel_A <- sort(treelabel_A)
@@ -63,7 +64,7 @@ treeA_plot_new <- treeA_plot %<+% df_label_A +
   )
 treeA_plot_new
 
-#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/BEAST/tree_rsvA_EU_season.pdf", width = 300, height = 1000, units = "cm", limitsize = FALSE)
+ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/BEAST/tree_rsvA_EU_season.pdf", width = 500, height = 1000, units = "cm", limitsize = FALSE)
 
 # Tree visualization: RSV B
 
