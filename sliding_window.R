@@ -7,9 +7,10 @@
 library(dplyr)
 library(tidyr)
 library(stringr)
-library(ggplot2)
 library(lubridate)
 library(MMWRweek)
+library(ggplot2)
+library(patchwork) #combines plots in one figure
 
 #################################################################################
 
@@ -336,9 +337,9 @@ case_count_func <- function(country) {
 
 dist_mean_DEU <- sliding_window_func(country = "DEU")
 #dist_mean_ESP <- sliding_window_func(country = "ESP")
-dist_mean_NLD <- sliding_window_func(country = "NLD")
+#dist_mean_NLD <- sliding_window_func(country = "NLD")
 #dist_mean_GBR <- sliding_window_func(country = "GBR")
-#dist_mean_EU <- sliding_window_func(country = "EU")
+dist_mean_EU <- sliding_window_func(country = "EU")
 
 #################################################################################
 
@@ -346,19 +347,19 @@ dist_mean_NLD <- sliding_window_func(country = "NLD")
 
 case_win_DEU <- case_count_func("DEU")
 #case_win_ESP <- case_count_func("ESP")
-case_win_NLD <- case_count_func("NLD")
+#case_win_NLD <- case_count_func("NLD")
 #case_win_GBR <- case_count_func("GBR")
-#case_win_EU <- case_count_func("EU")
+case_win_EU <- case_count_func("EU")
 
 #################################################################################
 
 # Plots
 
 dist_mean_1 <- dist_mean_DEU ##
-dist_mean_2 <- dist_mean_NLD ##
+dist_mean_2 <- dist_mean_EU ##
 
 case_win_1 <- case_win_DEU ##
-case_win_2 <- case_win_NLD ##
+case_win_2 <- case_win_EU ##
 
 ## Evo (changed 20000 to 30000!)
 sliding_window_plot <- ggplot(dist_mean_1, aes(x = start_date, y = dist_mean)) +
@@ -372,24 +373,11 @@ sliding_window_plot <- ggplot(dist_mean_1, aes(x = start_date, y = dist_mean)) +
 #  geom_line(data = case_win_1, aes(x = start_date, y = sum/200000), colour = "red", alpha = 0.45) +
 #  geom_line(data = case_win_2, aes(x = start_date, y = sum/200000), colour = "darkgreen", alpha = 0.45) +
   scale_x_continuous(breaks = c(2014:2023)) +
+#  scale_y_continuous("distance (mean)", sec.axis = sec_axis(~.*30000, name="sequence count"), limits = c(0, 0.02)) + # IF NECESSARY ADJUST Y-AXIS
   theme_minimal() +
-  scale_y_continuous("distance (mean)", sec.axis = sec_axis(~.*30000, name="sequence count"), limits = c(0, 0.02)) # IF NECESSARY ADJUST Y-AXIS
+  xlab("time") +
+  ylab("evolutionary distance (mean)")
 sliding_window_plot
-
-# sequence count
-ggplot(data = dist_mean_1, aes(x = start_date, y = num)) +
-  geom_line(colour = "red") +
-  geom_line(aes(y = dist_mean_2$num), colour = "darkgreen") +
-  scale_x_continuous(breaks = c(2014:2023)) +
-  ylim(0, 80) +
-  theme_minimal() 
-  
-# case count
-ggplot(data = case_win_1, aes(x = start_date, y = sum)) + 
-  geom_line(colour = "red") +
-  geom_line(data = case_win_2, aes(x = start_date, y = sum), colour = "darkgreen") +
-  scale_x_continuous(breaks = c(2014:2023)) +
-  theme_minimal() 
 
 ## SNP
 sliding_window_plot <- ggplot(dist_mean_1, aes(x = start_date, y = dist_mean)) +
@@ -397,10 +385,40 @@ sliding_window_plot <- ggplot(dist_mean_1, aes(x = start_date, y = dist_mean)) +
   geom_errorbar(aes(ymin = dist_mean-dist_std, ymax = dist_mean+dist_std), colour = "black", alpha = 0.45) +
   geom_point(colour = "red") +
   geom_point(data = dist_mean_2, aes(x = start_date, y = dist_mean), colour = "darkgreen") +
-  geom_line(aes(y = num/1.33), colour = "red") +
-  geom_line(aes(y = dist_mean_2$num/1.33), colour = "darkgreen") +
-  geom_line(aes(y = (num + dist_mean_2$num)/1.33), colour = "black", alpha = 0.4) +
+#  geom_line(aes(y = num/1.33), colour = "red") +
+#  geom_line(aes(y = dist_mean_2$num/1.33), colour = "darkgreen") +
+#  geom_line(aes(y = (num + dist_mean_2$num)/1.33), colour = "black", alpha = 0.4) +
+  scale_x_continuous(breaks = c(2014:2023)) +
+#  scale_y_continuous("distance (mean)", sec.axis = sec_axis(~.*1.33, name="sequence count"), limits = c(0, 300)) + # IF NECESSARY ADJUST Y-AXIS
+  theme_minimal() +
+  xlab("time") +
+  ylab("SNP distance (mean)")
+#sliding_window_plot
+
+## Sequence count
+sequence_count_plot <- ggplot(data = dist_mean_1) +
+  geom_line(aes(x = start_date, y = num), colour = "red") +
+  geom_line(aes(x = start_date, y = dist_mean_2$num), colour = "darkgreen") +
+  scale_x_continuous(breaks = c(2014:2023)) + 
+  theme_minimal() +
+  xlab("time") +
+  ylab("sequence count")
+#sequence_count_plot
+
+## Case count
+case_count_plot <- ggplot() + 
+  geom_line(data = case_win_1, aes(x = start_date, y = sum*40), colour = "red") +
+  geom_line(data = case_win_2, aes(x = start_date, y = sum), colour = "darkgreen") +
   scale_x_continuous(breaks = c(2014:2023)) +
   theme_minimal() +
-  scale_y_continuous("distance (mean)", sec.axis = sec_axis(~.*1.33, name="sequence count"), limits = c(0, 300)) # IF NECESSARY ADJUST Y-AXIS
-sliding_window_plot
+  scale_y_continuous("case count (EU)", sec.axis = sec_axis(~./40, name="case count (DEU)"), limits = c(0, 45000)) +
+  xlab("time") +
+  ylab("case count")
+#case_count_plot
+
+# Combined plot
+
+combined_plot <- sliding_window_plot / sequence_count_plot / case_count_plot + plot_layout(heights = c(2, 1, 1))
+combined_plot
+
+ggsave("~/Yale_Projects/Genetic_Diversity_RSV/Plots/sliding_window_rsvB_evo_EU_combined.png", width = 50, height = 25, units = "cm", limitsize = FALSE)
