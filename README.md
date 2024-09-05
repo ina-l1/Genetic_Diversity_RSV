@@ -61,7 +61,7 @@ Bayesian phylogenetic analysis was conducted using BEAST.
 
 SNP distance was calculated using snp-dists (v0.7.0).
 
->Seemann, T. (2018). Source code for snp-dists software (0.6.2). Zenodo. `https://doi.org/10.5281/zenodo.1411986`
+>Seemann, T. (2018). Source code for snp-dists software (0.6.2). Zenodo. https://doi.org/10.5281/zenodo.1411986
 
 Sequence data was visualized and edited using SeaView (v5.0.5) and UGENE (v50.0).
 
@@ -92,7 +92,7 @@ Examining the temporal pattern of genetic diversity within an epidemic cycle cou
 
 ### Author list
 
-Ina Li, RWTH Aachen University, Germany / Department of Epidemiology of Microbial Diseases, Yale School of Public Health, USA. <br>
+Ina Li, RWTH Aachen University, Germany and Department of Epidemiology of Microbial Diseases, Yale School of Public Health, USA. <br>
 Jiye Kwon, Department of Epidemiology of Microbial Diseases, Yale School of Public Health, USA. <br>
 Verity Hill, Department of Epidemiology of Microbial Diseases, Yale School of Public Health, USA. <br>
 C. Brandon Ogbunu, Department of Ecology and Evolutionary Biology, Yale School of Medicine, USA. <br>
@@ -102,4 +102,4 @@ Daniel M. Weinberger, Department of Epidemiology of Microbial Diseases, Yale Sch
 
 ## Contact
 
-For questions please reach out: Ina Li, ina.li@rwth-aachen.de
+For questions please reach out: ina.li@rwth-aachen.de
