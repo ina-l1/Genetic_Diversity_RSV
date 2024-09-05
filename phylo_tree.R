@@ -3,7 +3,6 @@
 library(dplyr)
 library(MMWRweek)
 library(ggplot2)
-library(scales)
 library(ape)
 library(treeio)
 library(ggtree)
@@ -26,8 +25,7 @@ rsvB_ref$'EU/GER' <- ifelse(rsvB_ref$Country == "Germany", "GER", "EU") ###
 
 # Tree visualization: RSV A
 
-#tree_A <- read.tree("~/Yale_Projects/Genetic_Diversity_RSV/Europe/Treefiles/tree_rsvA_MAFFT_alignment_EU.treefile") #read.nexus for NEXUS format, read.tree for Newick format
-tree_A <- read.tree("~/Yale_Projects/Genetic_Diversity_RSV/BEAST/tree_files/tree_rsA_EU.trees") 
+tree_A <- read.tree("~/Yale_Projects/Genetic_Diversity_RSV/BEAST/tree_files/tree_rsvA_EU.trees") #read.nexus for NEXUS format, read.tree for Newick format
 
 treelabel_A <- tree_A$tip.label
 treelabel_A <- sort(treelabel_A)
@@ -51,25 +49,25 @@ treeA_plot
 df_label_A <- relocate(df_label_A, tip.label) #move tip.label to first column for plotting
 
 treeA_plot_new <- treeA_plot %<+% df_label_A + 
-  geom_tippoint(aes(color = season), size=20) + #color = season
+  geom_tippoint(aes(color = country), size=20) + #color = season
   geom_tiplab(
     geom = "text",
     size = 10
   ) +
 #  scale_color_manual(values = c("GER" = "red", "EU" =  "blue")) +
-  guides(color = guide_legend(title = "Season")) + #title = "Season"
+  guides(color = guide_legend(title = "Country")) + #title = "Season"
   theme(
     legend.title = element_text(size = 30),
     legend.text = element_text(size = 30)
   )
 treeA_plot_new
 
-ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/BEAST/tree_rsvA_EU_season.pdf", width = 500, height = 1000, units = "cm", limitsize = FALSE)
+#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/BEAST/tree_rsvA_EU_country.pdf", width = 500, height = 1000, units = "cm", limitsize = FALSE)
 
 # Tree visualization: RSV B
 
 #tree_B <- read.tree("~/Yale_Projects/Genetic_Diversity_RSV/Europe/Treefiles/tree_rsvB_MAFFT_alignment_EU.treefile")
-tree_B <- read.tree("~/Yale_Projects/Genetic_Diversity_RSV/BEAST/tree_rsvB_EU.tree") 
+tree_B <- read.tree("~/Yale_Projects/Genetic_Diversity_RSV/BEAST/tree_files/tree_rsvB_EU.trees") 
 
 treelabel_B <- tree_B$tip.label
 treelabel_B <- sort(treelabel_B)
@@ -106,4 +104,4 @@ treeB_plot_new <- treeB_plot %<+% df_label_B +
   ) 
 treeB_plot_new
 
-#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/BEAST/tree_rsvB_EU.pdf", width = 300, height = 1000, units = "cm", limitsize = FALSE)
+#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/BEAST/tree_rsvB_EU_GER.pdf", width = 500, height = 1000, units = "cm", limitsize = FALSE)
