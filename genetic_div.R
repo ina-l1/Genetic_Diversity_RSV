@@ -2,15 +2,10 @@
 # Visualize using MDS
 # Violin plots show genetic diversity within and between season 
 
-library(dplyr)
-library(stringr)
+library(tidyr)
 library(ape)
-#library(bio3d)
 library(ggplot2)
-library(plotly)
-library(adegenet)
 library(usedist) #dist_groups()
-library(phangorn) #https://cran.r-project.org/web/packages/phangorn/phangorn.pdf dist.hamming() and dist.ml()
 
 # Read sequence alignment and metadata
 
@@ -51,8 +46,8 @@ evo_dist_rsvB <- dist.dna(aln_rsvB, model = "TN93",
                       pairwise.deletion = FALSE,
                       as.matrix = TRUE)
 
-write.csv(evo_dist_rsvA, file = "~/Yale_Projects/Genetic_Diversity_RSV/Europe/evodist_rsvA_EU_noGer.csv")
-write.csv(evo_dist_rsvB, file = "~/Yale_Projects/Genetic_Diversity_RSV/Europe/evodist_rsvB_EU_noGer.csv")
+#write.csv(evo_dist_rsvA, file = "~/Yale_Projects/Genetic_Diversity_RSV/Europe/evodist_rsvA_EU_noGer.csv")
+#write.csv(evo_dist_rsvB, file = "~/Yale_Projects/Genetic_Diversity_RSV/Europe/evodist_rsvB_EU_noGer.csv")
 
 # SNP distance with snp-dists
 
@@ -90,12 +85,12 @@ mds_snp_rsvA <- as.data.frame(mds_snp_rsvA_eig[1])
 mds_snp_rsvB_eig <- cmdscale(snp_dist_rsvB, k = 2, eig = TRUE)
 mds_snp_rsvB <- as.data.frame(mds_snp_rsvB_eig[1])
 
-# Hamming distance
+'# Hamming distance
 mds_ham_rsvA_eig <- cmdscale(ham_dist_rsvA, k = 2, eig = TRUE)
 mds_ham_rsvA <- as.data.frame(mds_ham_rsvA_eig[1])
 
 mds_ham_rsvB_eig <- cmdscale(ham_dist_rsvB, k = 2, eig = TRUE)
-mds_ham_rsvB <- as.data.frame(mds_ham_rsvB_eig[1])
+mds_ham_rsvB <- as.data.frame(mds_ham_rsvB_eig[1])'
 
 # Plot MDS
 
@@ -120,7 +115,7 @@ x_mds_snp_rsvB <- mds_snp_rsvB[, 1]
 y_mds_snp_rsvB <- mds_snp_rsvB[, 2]
 
 plot_mds_snp_rsvB <- plot(x_mds_snp_rsvB, y_mds_snp_rsvB)
-
+'
 # Hamming distance
 x_mds_ham_rsvA <- mds_ham_rsvA[, 1]
 y_mds_ham_rsvA <- mds_ham_rsvA[, 2]
@@ -130,7 +125,7 @@ plot_mds_ham_rsvA <- plot(x_mds_ham_rsvA, y_mds_ham_rsvA)
 x_mds_ham_rsvB <- mds_ham_rsvB[, 1]
 y_mds_ham_rsvB <- mds_ham_rsvB[, 2]
 
-plot_mds_ham_rsvB <- plot(x_mds_ham_rsvB, y_mds_ham_rsvB)
+plot_mds_ham_rsvB <- plot(x_mds_ham_rsvB, y_mds_ham_rsvB)'
 
 # Calculate proportion of variance explained through MDS
 
@@ -167,14 +162,14 @@ variance_explained_dim2_snp <- eigenvalues_snp[2] / total_variance_snp
 # Combined variance explained by the two dimensions
 combined_variance_explained_snp <- variance_explained_dim1_snp + variance_explained_dim2_snp
 combined_variance_explained_snp
-
+'
 ## Hamming distance
 eigenvalues_ham <- mds_ham_rsvA_eig$eig
 total_variance_ham <- sum(eigenvalues_ham[eigenvalues_ham > 0])
 variance_explained_dim1_ham <- eigenvalues_ham[1] / total_variance_ham
 variance_explained_dim2_ham <- eigenvalues_ham[2] / total_variance_ham
 # Combined variance explained by the two dimensions
-combined_variance_explained_ham <- variance_explained_dim1_ham + variance_explained_dim2_ham
+combined_variance_explained_ham <- variance_explained_dim1_ham + variance_explained_dim2_ham'
 
 # Plot MDS with labels 
 
@@ -212,7 +207,7 @@ df_mds_snp_rsvB <- arrange(df_mds_snp_rsvB, ID)
 
 mds_snp_meta_rsvB <- cbind(meta_rsvB_short, df_mds_snp_rsvB)
 
-# Hamming: Create df with labels
+'# Hamming: Create df with labels
 df_mds_ham_rsvA <- data.frame(x_axis = x_mds_ham_rsvA, y_axis = y_mds_ham_rsvA)
 df_mds_ham_rsvA$ID <- as.numeric(rownames(df_mds_ham_rsvA))
 df_mds_ham_rsvA <- relocate(df_mds_ham_rsvA, ID)
@@ -227,7 +222,7 @@ df_mds_ham_rsvB <- relocate(df_mds_ham_rsvB, ID)
 rownames(df_mds_ham_rsvB) <- c(1:nrow(df_mds_ham_rsvB))
 df_mds_ham_rsvB <- arrange(df_mds_ham_rsvB, ID)
 
-mds_ham_meta_rsvB <- cbind(meta_rsvB_short, df_mds_ham_rsvB)
+mds_ham_meta_rsvB <- cbind(meta_rsvB_short, df_mds_ham_rsvB)'
 
 # MDS Plots
 

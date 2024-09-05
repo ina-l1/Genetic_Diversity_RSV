@@ -1,7 +1,6 @@
 # Project: Change in genetic diversity of RSV isolates over the course of one pandemic season in Germany
 # Data Sorting 
 
-library(dplyr)
 library(tidyr)
 library(MMWRweek)
 

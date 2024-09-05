@@ -1,7 +1,6 @@
 # Data visualization
 # Sequence count (GenBank) and case count (WHO FluNet) 
 
-library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(lubridate)
@@ -70,7 +69,7 @@ tab_rsvAB_EU_season <- as.data.frame.matrix(table(rsvAB_EU$Collection_Season, rs
 
 # Time series
 
-timeseries_plot <- ggplot(rsvAB, aes(x = Collection_Date, color = Type, fill = Type))+
+timeseries_plot <- ggplot(rsvAB, aes(x = Collection_Date, color = Type, fill = Type)) +
   geom_histogram(binwidth = 7)+
   scale_x_date(
     date_breaks = "3 months", 
@@ -115,7 +114,18 @@ ggplot(case_count_DEU, aes(x = MMWR_WEEKSTARTDATE, y = RSV)) +
     date_labels = "%Y"
   ) +
   xlab("year") +
-  ylab("RSV case count")
+  ylab("RSV case count") +
+  theme_minimal()
+
+ggplot(case_count_DEU, aes(x = MMWR_WEEKSTARTDATE, y = RSV)) +
+  geom_line() +
+  scale_x_date(
+    date_breaks = "1 year",
+    date_labels = "%Y"
+  ) +
+  xlab("year") +
+  ylab("RSV case count") +
+  theme_minimal()
 
 #################################################################################
 
@@ -130,6 +140,18 @@ ggplot() +
   ) +
   xlab("year") +
   ylab("RSV sequence count")
+
+ggplot() +
+  geom_bar(data = case_count_DEU, aes(x = MMWR_WEEKSTARTDATE, y = RSV), fill = "darkgreen", colour = "darkgreen", stat = "identity") +
+  geom_bar(data = seq_count_DEU, aes(x = MMWR_start_date, y = count), fill = "orange", colour = "orange", stat = "identity") +
+  scale_x_date(
+    date_breaks = "1 year",
+    date_labels = "%Y"
+  ) +
+  xlab("year") +
+  ylab("count") +
+  theme_minimal()
+  
 
 ggplot() +
   geom_line(data = case_count_ESP, aes(x = MMWR_WEEKSTARTDATE, y = RSV), colour = "orange") +

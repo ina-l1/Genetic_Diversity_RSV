@@ -1,6 +1,5 @@
 # Genetic distance to reference sequence
 
-library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(lubridate)

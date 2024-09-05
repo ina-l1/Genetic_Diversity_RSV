@@ -4,17 +4,13 @@
 # Countries: Netherlands, Spain, UK
 # All included EU countries: Austria, Finland, France, Germany, Italy, Netherlands, Russia, Spain, United Kingdom 
 
-library(dplyr)
 library(tidyr)
-library(stringr)
 library(lubridate)
 library(MMWRweek)
 library(ggplot2)
 library(patchwork) #combines plots in one figure
 
 #################################################################################
-
-rsvAB_choose <- "rsvB" ##
 
 # Sequence data: Read metadata
 
@@ -141,27 +137,6 @@ colnames(dist_rsvB_GBR) <- meta_rsvB_GBR$Accession
 
 rownames(dist_rsvB_EU) <- meta_rsvB_EU$Accession
 colnames(dist_rsvB_EU) <- meta_rsvB_EU$Accession
-
-#################################################################################
-
-if(rsvAB_choose == "rsvA") {
-  dist_rsvAB_DEU <- dist_rsvA_DEU
-  dist_rsvAB_ESP <- dist_rsvA_ESP
-  dist_rsvAB_NLD <- dist_rsvA_NLD
-  dist_rsvAB_GBR <- dist_rsvA_GBR
-  dist_rsvAB_EU <- dist_rsvA_EU
-  RefSeq <- RefSeq_rsvA
-  
-} else if(rsvAB_choose == "rsvB") {
-  dist_rsvAB_DEU <- dist_rsvB_DEU
-  dist_rsvAB_ESP <- dist_rsvB_ESP
-  dist_rsvAB_NLD <- dist_rsvB_NLD
-  dist_rsvAB_GBR <- dist_rsvB_GBR
-  dist_rsvAB_EU <- dist_rsvB_EU
-  RefSeq <- RefSeq_rsvB
-} else {
-  print("Choose rsvA or rsvB!")
-}
 
 #################################################################################
 
@@ -333,40 +308,65 @@ case_count_func <- function(country) {
 
 #################################################################################
 
+# Choose RSV-A or RSV-B ("rsvA" or "rsvB")
+
+rsvAB_choose <- "rsvA" ##
+
+if(rsvAB_choose == "rsvA") {
+  dist_rsvAB_DEU <- dist_rsvA_DEU
+  dist_rsvAB_ESP <- dist_rsvA_ESP
+  dist_rsvAB_NLD <- dist_rsvA_NLD
+  dist_rsvAB_GBR <- dist_rsvA_GBR
+  dist_rsvAB_EU <- dist_rsvA_EU
+  RefSeq <- RefSeq_rsvA
+  
+} else if(rsvAB_choose == "rsvB") {
+  dist_rsvAB_DEU <- dist_rsvB_DEU
+  dist_rsvAB_ESP <- dist_rsvB_ESP
+  dist_rsvAB_NLD <- dist_rsvB_NLD
+  dist_rsvAB_GBR <- dist_rsvB_GBR
+  dist_rsvAB_EU <- dist_rsvB_EU
+  RefSeq <- RefSeq_rsvB
+} else {
+  print("Choose rsvA or rsvB!")
+}
+
+#################################################################################
+
 # Distances
 
-dist_mean_DEU <- sliding_window_func(country = "DEU")
-#dist_mean_ESP <- sliding_window_func(country = "ESP")
-#dist_mean_NLD <- sliding_window_func(country = "NLD")
+#dist_mean_DEU <- sliding_window_func(country = "DEU")
+dist_mean_ESP <- sliding_window_func(country = "ESP")
+dist_mean_NLD <- sliding_window_func(country = "NLD")
 #dist_mean_GBR <- sliding_window_func(country = "GBR")
-dist_mean_EU <- sliding_window_func(country = "EU")
+#dist_mean_EU <- sliding_window_func(country = "EU")
 
 #################################################################################
 
 # Case count (FluNet)
 
-case_win_DEU <- case_count_func("DEU")
-#case_win_ESP <- case_count_func("ESP")
-#case_win_NLD <- case_count_func("NLD")
+#case_win_DEU <- case_count_func("DEU")
+case_win_ESP <- case_count_func("ESP")
+case_win_NLD <- case_count_func("NLD")
 #case_win_GBR <- case_count_func("GBR")
-case_win_EU <- case_count_func("EU")
+#case_win_EU <- case_count_func("EU")
 
 #################################################################################
 
 # Plots
 
 dist_mean_1 <- dist_mean_DEU ##
-dist_mean_2 <- dist_mean_EU ##
+dist_mean_2 <- dist_mean_NLD ##
 
 case_win_1 <- case_win_DEU ##
-case_win_2 <- case_win_EU ##
+case_win_2 <- case_win_NLD ##
 
 ## Evo (changed 20000 to 30000!)
 sliding_window_plot <- ggplot(dist_mean_1, aes(x = start_date, y = dist_mean)) +
   geom_errorbar(data = dist_mean_2, aes(ymin = dist_mean-dist_std, ymax = dist_mean+dist_std), colour = "lightgrey") +
-  geom_errorbar(aes(ymin = dist_mean-dist_std, ymax = dist_mean+dist_std), colour = "black", alpha = 0.45) +
-  geom_point(colour = "red") +
-  geom_point(data = dist_mean_2, aes(x = start_date, y = dist_mean), colour = "darkgreen") +
+#  geom_errorbar(aes(ymin = dist_mean-dist_std, ymax = dist_mean+dist_std), colour = "black", alpha = 0.45) +
+  geom_point(data = dist_mean_2, aes(x = start_date, y = dist_mean), colour = "blue") + #darkgreen
+#  geom_point(colour = "red") +
 #  geom_line(aes(y = num/30000), colour = "red", linewidth = 0.8) +
 #  geom_line(aes(y = dist_mean_2$num/30000), colour = "darkgreen", linewidth = 0.8) +
 #  geom_line(aes(y = (num + dist_mean_2$num)/30000), colour = "black", alpha = 0.4) +
@@ -398,23 +398,23 @@ sliding_window_plot <- ggplot(dist_mean_1, aes(x = start_date, y = dist_mean)) +
 ## Sequence count
 sequence_count_plot <- ggplot(data = dist_mean_1) +
   geom_line(aes(x = start_date, y = num), colour = "red") +
-  geom_line(aes(x = start_date, y = dist_mean_2$num), colour = "darkgreen") +
+  geom_line(aes(x = start_date, y = dist_mean_2$num), colour = "blue") +
   scale_x_continuous(breaks = c(2014:2023)) + 
   theme_minimal() +
   xlab("time") +
   ylab("sequence count")
-#sequence_count_plot
+sequence_count_plot
 
 ## Case count
 case_count_plot <- ggplot() + 
   geom_line(data = case_win_1, aes(x = start_date, y = sum*40), colour = "red") +
-  geom_line(data = case_win_2, aes(x = start_date, y = sum), colour = "darkgreen") +
+  geom_line(data = case_win_2, aes(x = start_date, y = sum), colour = "blue") +
   scale_x_continuous(breaks = c(2014:2023)) +
   theme_minimal() +
   scale_y_continuous("case count (EU)", sec.axis = sec_axis(~./40, name="case count (DEU)"), limits = c(0, 45000)) +
   xlab("time") +
   ylab("case count")
-#case_count_plot
+case_count_plot
 
 # Combined plot
 
