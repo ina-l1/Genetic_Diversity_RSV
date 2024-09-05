@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is the GitHub repository for the following ongoing project: 
+This is the GitHub repository for the following ongoing project: <br>
 *Investigating temporal dynamics of genetic diversity in RSV subgroups during an epidemic cycle in Germany, 2014-2023*
 
 This study uses RSV genomic data to analyze the temporal dynamics of RSV within the epidemic season. For further information please refer to the abstract below.  
