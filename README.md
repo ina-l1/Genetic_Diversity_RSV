@@ -10,19 +10,23 @@ For further information please refer to the abstract below.
 
 ### Files and folder structure
 
-**Germany** German sequences, ML-trees, metadata and distance matrices. <br>
-**Europe** European (non-German) sequences, ML-trees, metadata and distance matrices. <br>
-**Plots** Generated plots. <br>
-**RefSeq** Reference sequence data. <br>
-**BEAST_output** Annotated time-scaled phylogenetic trees and skygrids. For raw BEAST output please contact the author. <br>
+| Folder    | Content |
+| -------- | ------- |
+| Germany  | German sequences, ML-trees, metadata and distance matrices. |
+| Europe | European (non-German) sequences, ML-trees, metadata and distance matrices. |
+| Plots    | Generated plots. |
+| RefSeq  | Reference sequence data. |
+| BEAST_output | Annotated time-scaled phylogenetic trees and skygrids. <br> For raw BEAST output please contact the author. |
 
-**datasorting.R** Read GenBank output and create metadata tables. <br>
-**timeseries.R** Visualization of sequence and case numbers. <br>
-**genetic_div.R** Calculating distance matrices and visualize using MDS (multidimensional scaling). <br>
-**sliding_window.R** Implementation of 8-week sliding window to visualize the dynamics of genetic diversity over time. <br>
-**ref_dist.R** Pairwise distance of sequences to reference sequence in 8-week sliding window. <br>
-**phylo_tree.R** Reading and annotating time-scaled phylogenetic trees (BEAST output). <br>
-**skygrid.R** Plotting skygrid data (BEAST output). <br>
+| File    | Content |
+| -------- | ------- |
+| datasorting.R  | Read GenBank output and create metadata tables. |
+| timeseries.R | Visualization of sequence and case numbers. |
+| genetic_div.R    | Calculating distance matrices and visualize using MDS (multidimensional scaling). |
+| sliding_window.R  | Implementation of 8-week sliding window to visualize the dynamics of genetic diversity over time. |
+| ref_dist.R | Pairwise distance of sequences to reference sequence in 8-week sliding window.|
+| phylo_tree.R  | Reading and annotating time-scaled phylogenetic trees (BEAST output). |
+| skygrid.R | Plotting skygrid data (BEAST output).|
 
 ### Installation 
 
@@ -102,4 +106,4 @@ Daniel M. Weinberger, Department of Epidemiology of Microbial Diseases, Yale Sch
 
 ## Contact
 
-For questions please reach out: ina.li@rwth-aachen.de
+For questions please contact: ina.li@rwth-aachen.de
