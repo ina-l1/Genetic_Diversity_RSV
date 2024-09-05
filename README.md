@@ -5,17 +5,24 @@
 This is the GitHub repository for the following ongoing project: <br>
 *Investigating temporal dynamics of genetic diversity in RSV subgroups during an epidemic cycle in Germany, 2014-2023*
 
-This study uses RSV genomic data to analyze the temporal dynamics of RSV within the epidemic season. For further information please refer to the abstract below.  
+This study uses RSV genomic data to analyze the temporal dynamics of RSV within the epidemic season. <br>
+For further information please refer to the abstract below.  
 
 ### Files and folder structure
 
-**datasorting.R** Read GenBank output and create metadata tables.
-**timeseries.R** Visualization of sequence and case numbers.
-**genetic_div.R** Calculating distance matrices and visualize using MDS (multidimensional scaling).
-**sliding_window.R** Implementation of 8-week sliding window to visualize the dynamics of genetic diversity over time.
-**ref_dist.R** Pairwise distance of sequences to reference sequence in 8-week sliding window.
-**phylo_tree.R** Reading and annotating time-scaled phylogenetic trees (BEAST output).
-**skygrid.R** Plotting skygrid data (BEAST output).
+**Germany** German sequences, ML-trees, metadata and distance matrices. <br>
+**Europe** European (non-German) sequences, ML-trees, metadata and distance matrices. <br>
+**Plots** Generated plots. <br>
+**RefSeq** Reference sequence data. <br>
+**BEAST_output** Annotated time-scaled phylogenetic trees and skygrids. For raw BEAST output please contact the author. <br>
+
+**datasorting.R** Read GenBank output and create metadata tables. <br>
+**timeseries.R** Visualization of sequence and case numbers. <br>
+**genetic_div.R** Calculating distance matrices and visualize using MDS (multidimensional scaling). <br>
+**sliding_window.R** Implementation of 8-week sliding window to visualize the dynamics of genetic diversity over time. <br>
+**ref_dist.R** Pairwise distance of sequences to reference sequence in 8-week sliding window. <br>
+**phylo_tree.R** Reading and annotating time-scaled phylogenetic trees (BEAST output). <br>
+**skygrid.R** Plotting skygrid data (BEAST output). <br>
 
 ### Installation 
 
@@ -35,26 +42,28 @@ To run code offline please adjust the file paths accordingly.
 - ape (5.8): Reading and analyzing genomic data
 - usedist (0.4.0): Calculate distance matrix
 
-`# Required packages
+```
+# Required packages
 libs <- c("tidyr", "ggplot2", "patchwork", "ggtree", "treeio", "lubridate", "MMWRweek", "ape", "usedist")
 
 # Install and load missing packages
 sapply(libs, function(pkg) {
-  if (!pkg %in% installed.packages()[, "Package"]) install.packages(pkg)
-  library(pkg, character.only = TRUE)
-})`
+    if (!pkg %in% installed.packages()[, "Package"]) install.packages(pkg)
+    library(pkg, character.only = TRUE)
+})
+```
 
 ### Other software
 
-Bayesian phylogenetic analysis was conducted using BEAST (Suchard MA *et al.*, 2018).
+Bayesian phylogenetic analysis was conducted using BEAST.
 
 >Suchard MA, Lemey P, Baele G, Ayres DL, Drummond AJ & Rambaut A (2018) Bayesian phylogenetic and phylodynamic data integration using BEAST 1.10 Virus Evolution 4, vey016. DOI: 10.1093/ve/vey01
 
 SNP distance was calculated using snp-dists (v0.7.0).
 
->Seemann, T. (2018). Source code for snp-dists software (0.6.2). Zenodo. https://doi.org/10.5281/zenodo.1411986
+>Seemann, T. (2018). Source code for snp-dists software (0.6.2). Zenodo. `https://doi.org/10.5281/zenodo.1411986`
 
-Sequence data was visualized and edited using SeaView (v5.0.5) and UGENE (v50.0)
+Sequence data was visualized and edited using SeaView (v5.0.5) and UGENE (v50.0).
 
 >Gouy, M. Guindon, S. & Gascuel., O. (2010) SeaView version 4 : a multiplatform graphical user interface for sequence alignment and phylogenetic tree building. Molecular Biology and Evolution 27(2):221-224. 
 Galtier, N., Gouy, M. & Gautier, C. (1996) SEAVIEW and PHYLO_WIN: two graphic tools for sequence alignment and molecular phylogeny. Comput. Appl. Biosci., 12:543-548.
@@ -83,10 +92,14 @@ Examining the temporal pattern of genetic diversity within an epidemic cycle cou
 
 ### Author list
 
-Ina Li, RWTH Aachen University, Germany / Department of Epidemiology of Microbial Diseases, Yale School of Public Health, USA.
-Jiye Kwon, Department of Epidemiology of Microbial Diseases, Yale School of Public Health, USA.
-Verity Hill, Department of Epidemiology of Microbial Diseases, Yale School of Public Health, USA.
-C. Brandon Ogbunu, Department of Ecology and Evolutionary Biology, Yale School of Medicine, USA.
-Anna Matuszyńska, Computational Life Science, Department of Biology, RWTH Aachen University, Germany.
-Virginia E. Pitzer, Department of Epidemiology of Microbial Diseases, Yale School of Public Health, USA.
-Daniel M. Weinberger, Department of Epidemiology of Microbial Diseases, Yale School of Public Health, USA.
+Ina Li, RWTH Aachen University, Germany / Department of Epidemiology of Microbial Diseases, Yale School of Public Health, USA. <br>
+Jiye Kwon, Department of Epidemiology of Microbial Diseases, Yale School of Public Health, USA. <br>
+Verity Hill, Department of Epidemiology of Microbial Diseases, Yale School of Public Health, USA. <br>
+C. Brandon Ogbunu, Department of Ecology and Evolutionary Biology, Yale School of Medicine, USA. <br>
+Anna Matuszyńska, Computational Life Science, Department of Biology, RWTH Aachen University, Germany. <br>
+Virginia E. Pitzer, Department of Epidemiology of Microbial Diseases, Yale School of Public Health, USA. <br>
+Daniel M. Weinberger, Department of Epidemiology of Microbial Diseases, Yale School of Public Health, USA. <br>
+
+## Contact
+
+For questions please reach out: Ina Li, ina.li@rwth-aachen.de
