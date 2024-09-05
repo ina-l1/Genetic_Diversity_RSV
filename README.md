@@ -2,15 +2,14 @@
 
 ## Overview
 
-This is the GitHub repository for the following ongoing project: <br>
+This is the GitHub repository for the following ongoing project: 
 *Investigating temporal dynamics of genetic diversity in RSV subgroups during an epidemic cycle in Germany, 2014-2023*
 
-This study uses RSV genomic data to analyze the temporal dynamics of RSV within the epidemic season. <br>
-For further information please refer to the abstract below.  
+This study uses RSV genomic data to analyze the temporal dynamics of RSV within the epidemic season. For further information please refer to the abstract below.  
 
 ### Files and folder structure
 
-**datasorting.R** Read GenBank output and create metadata tables. <br>
+**datasorting.R** Read GenBank output and create metadata tables.
 **timeseries.R** Visualization of sequence and case numbers.
 **genetic_div.R** Calculating distance matrices and visualize using MDS (multidimensional scaling).
 **sliding_window.R** Implementation of 8-week sliding window to visualize the dynamics of genetic diversity over time.
