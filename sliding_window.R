@@ -5,6 +5,8 @@
 # All included EU countries: Austria, Finland, France, Germany, Italy, Netherlands, Russia, Spain, United Kingdom 
 
 library(tidyr)
+library(dplyr)
+library(tibble)
 library(lubridate)
 library(MMWRweek)
 library(ggplot2)
@@ -12,10 +14,19 @@ library(patchwork) #combines plots in one figure
 
 #################################################################################
 
+# Base directory
+
+base_dir <- "~/Yale_Projects/Genetic_Diversity_RSV/"
+
+#################################################################################
+
 # Sequence data: Read metadata
 
-meta_rsvA <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvA_ref_metadata_EU.csv") #already in alphabetical order
-meta_rsvB <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvB_ref_metadata_EU.csv")
+path_meta_rsvA <- file.path(base_dir, "Europe", "rsvA_ref_metadata_EU.csv")
+path_meta_rsvB <- file.path(base_dir, "Europe", "rsvB_ref_metadata_EU.csv")
+
+meta_rsvA <- read.csv(path_meta_rsvA)
+meta_rsvB <- read.csv(path_meta_rsvB)
 
 meta_rsvA$Collection_Date <- as_date(meta_rsvA$Collection_Date) 
 meta_rsvB$Collection_Date <- as_date(meta_rsvB$Collection_Date)
@@ -45,7 +56,9 @@ meta_rsvB_EU <- subset(meta_rsvB, Country != "Germany" | Accession == RefSeq_rsv
 
 # Case count: Read metadata
 
-case_flunet <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/VIW_FNT.csv")
+path_case_flunet <- file.path(base_dir, "Europe", "VIW_FNT.csv")
+case_flunet <- read.csv(path_case_flunet)
+
 case_flunet$ISO_WEEKSTARTDATE <- as_date(case_flunet$ISO_WEEKSTARTDATE)
 case_flunet$MMWR_WEEKSTARTDATE <- as_date(case_flunet$MMWR_WEEKSTARTDATE)
 
@@ -75,17 +88,29 @@ case_EU <- case_flunet %>% subset(COUNTRY_CODE == "AUT" | COUNTRY_CODE == "FIN" 
 
 # Distance matrices
 
-dist_rsvA_DEU <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Germany/evodist_rsvA.csv") ##
-dist_rsvA_NLD <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/evodist_rsvA_netherlands.csv") ##
-dist_rsvA_ESP <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/evodist_rsvA_spain.csv") ##
-dist_rsvA_GBR <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/evodist_rsvA_UK.csv") ##
-dist_rsvA_EU <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/evodist_rsvA_EU_noGer.csv") ##
+path_dist_rsvA_DEU <- file.path(base_dir, "Germany", "evodist_rsvA.csv") ##
+path_dist_rsvA_NLD <- file.path(base_dir, "Europe", "evodist_rsvA_netherlands.csv") ##
+path_dist_rsvA_ESP <- file.path(base_dir, "Europe", "evodist_rsvA_spain.csv") ##
+path_dist_rsvA_GBR <- file.path(base_dir, "Europe", "evodist_rsvA_UK.csv") ##
+path_dist_rsvA_EU <- file.path(base_dir, "Europe", "evodist_rsvA_EU_noGer.csv") ##
 
-dist_rsvB_DEU <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Germany/evodist_rsvB.csv") ##
-dist_rsvB_NLD <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/evodist_rsvB_netherlands.csv") ##
-dist_rsvB_ESP <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/evodist_rsvB_spain.csv") ##
-dist_rsvB_GBR <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/evodist_rsvB_UK.csv") ##
-dist_rsvB_EU <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/evodist_rsvB_EU_noGer.csv") ##
+path_dist_rsvB_DEU <- file.path(base_dir, "Germany", "evodist_rsvB.csv") ##
+path_dist_rsvB_NLD <- file.path(base_dir, "Europe", "evodist_rsvB_netherlands.csv") ##
+path_dist_rsvB_ESP <- file.path(base_dir, "Europe", "evodist_rsvB_spain.csv") ##
+path_dist_rsvB_GBR <- file.path(base_dir, "Europe", "evodist_rsvB_UK.csv") ##
+path_dist_rsvB_EU <- file.path(base_dir, "Europe", "evodist_rsvB_EU_noGer.csv") ##
+
+dist_rsvA_DEU <- read.csv(path_dist_rsvA_DEU) 
+dist_rsvA_NLD <- read.csv(path_dist_rsvA_NLD) 
+dist_rsvA_ESP <- read.csv(path_dist_rsvA_ESP) 
+dist_rsvA_GBR <- read.csv(path_dist_rsvA_GBR) 
+dist_rsvA_EU <- read.csv(path_dist_rsvA_EU)
+
+dist_rsvB_DEU <- read.csv(path_dist_rsvB_DEU) 
+dist_rsvB_NLD <- read.csv(path_dist_rsvB_NLD) 
+dist_rsvB_ESP <- read.csv(path_dist_rsvB_ESP) 
+dist_rsvB_GBR <- read.csv(path_dist_rsvB_GBR) 
+dist_rsvB_EU <- read.csv(path_dist_rsvB_EU)
 
 dist_matrix_func <- function(distance_matrix) {
   distance_matrix <- arrange(distance_matrix, distance_matrix[,1])
@@ -335,9 +360,9 @@ if(rsvAB_choose == "rsvA") {
 
 # Distances
 
-#dist_mean_DEU <- sliding_window_func(country = "DEU")
+dist_mean_DEU <- sliding_window_func(country = "DEU")
 dist_mean_ESP <- sliding_window_func(country = "ESP")
-dist_mean_NLD <- sliding_window_func(country = "NLD")
+#dist_mean_NLD <- sliding_window_func(country = "NLD")
 #dist_mean_GBR <- sliding_window_func(country = "GBR")
 #dist_mean_EU <- sliding_window_func(country = "EU")
 
@@ -345,9 +370,9 @@ dist_mean_NLD <- sliding_window_func(country = "NLD")
 
 # Case count (FluNet)
 
-#case_win_DEU <- case_count_func("DEU")
+case_win_DEU <- case_count_func("DEU")
 case_win_ESP <- case_count_func("ESP")
-case_win_NLD <- case_count_func("NLD")
+#case_win_NLD <- case_count_func("NLD")
 #case_win_GBR <- case_count_func("GBR")
 #case_win_EU <- case_count_func("EU")
 
@@ -356,10 +381,10 @@ case_win_NLD <- case_count_func("NLD")
 # Plots
 
 dist_mean_1 <- dist_mean_DEU ##
-dist_mean_2 <- dist_mean_NLD ##
+dist_mean_2 <- dist_mean_ESP ##
 
 case_win_1 <- case_win_DEU ##
-case_win_2 <- case_win_NLD ##
+case_win_2 <- case_win_ESP ##
 
 ## Evo (changed 20000 to 30000!)
 sliding_window_plot <- ggplot(dist_mean_1, aes(x = start_date, y = dist_mean)) +
@@ -421,4 +446,5 @@ case_count_plot
 combined_plot <- sliding_window_plot / sequence_count_plot / case_count_plot + plot_layout(heights = c(2, 1, 1))
 combined_plot
 
-ggsave("~/Yale_Projects/Genetic_Diversity_RSV/Plots/sliding_window_rsvB_evo_EU_combined.png", width = 50, height = 25, units = "cm", limitsize = FALSE)
+path_combined_plot <- file.path(base_dir, "Plots", "sliding_window_rsvB_evo_EU_combined.png")
+#ggsave(path_combined_plot, width = 50, height = 25, units = "cm", limitsize = FALSE)

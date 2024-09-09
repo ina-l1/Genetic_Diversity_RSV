@@ -1,27 +1,40 @@
 # Genetic distance to reference sequence
 
 library(tidyr)
+library(dplyr)
+library(tibble)
 library(ggplot2)
 library(lubridate)
 library(MMWRweek)
 
 #################################################################################
 
+# Base directory
+
+base_dir <- "~/Yale_Projects/Genetic_Diversity_RSV/"
+
+#################################################################################
+
 # RSV-A and RSV-B: Replace rsvA/rsvB
-# Diversity Measures: Replace snpdist/evodist/hamdist
+# Diversity Measures: Replace snp/evo/ham
 
-rsvAB_choose <- "rsvB" ##
+rsvAB_choose <- "rsvA" ##
 
-dist_rsvA_GER <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Germany/snpdist_rsvA.csv") ##
-dist_rsvA_EU <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/snpdist_rsvA_EU_noGer.csv") ##
-dist_rsvB_GER <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Germany/snpdist_rsvB.csv") ##
-dist_rsvB_EU <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/snpdist_rsvB_EU_noGer.csv") ##
+path_dist_rsvA_GER <- file.path(base_dir, "Germany", "evodist_rsvA.csv") ##
+path_dist_rsvA_EU <- file.path(base_dir, "Europe", "evodist_rsvA_EU_noGer.csv") ##
+path_dist_rsvB_GER <- file.path(base_dir, "Germany", "evodist_rsvB.csv") ##
+path_dist_rsvB_EU <- file.path(base_dir, "Europe", "evodist_rsvB_EU_noGer.csv") ##
+
+dist_rsvA_GER <- read.csv(path_dist_rsvA_GER) 
+dist_rsvA_EU <- read.csv(path_dist_rsvA_EU) 
+dist_rsvB_GER <- read.csv(path_dist_rsvB_GER) 
+dist_rsvB_EU <- read.csv(path_dist_rsvB_EU) 
 
 #################################################################################
 
 # Read metadata
 
-meta_rsvA <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvA_ref_metadata_EU.csv") #already in alphabetical order
+meta_rsvA <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvA_ref_metadata_EU.csv")
 meta_rsvB <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvB_ref_metadata_EU.csv")
 
 meta_rsvA$Collection_Date <- as_date(meta_rsvA$Collection_Date) 
@@ -40,44 +53,7 @@ meta_rsvB_EU <- subset(meta_rsvB, Country != "Germany" | Accession == RefSeq_rsv
 
 #################################################################################
 
-# Timetable (df) with weeks and years
-
-# Start: 2014 W40
-# End: 2023 W39
-# 2015 and 2020 have 53 instead of 53 weeks
-
-week <- rep(c(1:53), times = 10)
-year <- rep(c(2014:2023), each = 53)
-dates_df <- data.frame(year, week)
-
-vec <- which(dates_df$week == 53 & (dates_df$year != 2015 & dates_df$year!=2020)) #years with no 53rd week
-vec <- append(vec, which((between(dates_df$week, 1, 39) & dates_df$year == 2014)|(between(dates_df$week, 40, 53) & dates_df$year == 2023)))
-
-dates_df <- dates_df[-vec,]
-
-dates_df$date <- decimal_date(MMWRweek2Date(dates_df$year, dates_df$week))
-
-dates_df$index <- 1:nrow(dates_df)
-rownames(dates_df) <- dates_df$index
-
-# Determining window size and start/end date
-
-## SET WINDOW SIZE (weeks) ##
-sliding_window_size <- 8 
-
-sliding_window <- data.frame(matrix(ncol = 3))
-colnames(sliding_window) <- c("index","start_date","end_date")
-sliding_window <- sliding_window[-1,]
-
-for(i in 1:(nrow(dates_df)-(sliding_window_size - 1))) { 
-  sliding_window[i,"index"] <- i
-  sliding_window[i,"start_date"] <- dates_df$date[i]
-  sliding_window[i,"end_date"] <- dates_df$date[i+(sliding_window_size - 1)]
-}
-
-#################################################################################
-
-# Distance matrix 
+# Function: Distance matrix
 
 dist_matrix_func <- function(distance_matrix) {
   distance_matrix <- arrange(distance_matrix, distance_matrix[,1])
@@ -115,7 +91,7 @@ if(rsvAB_choose == "rsvA") {
 
 #################################################################################
 
-# Distance to Ref
+# Function: Distance to Ref
 
 refdist_mean_func <- function(dist_matrix, EUGER) {
   if(EUGER == "GER" & rsvAB_choose == "rsvA"){
@@ -160,6 +136,47 @@ refdist_mean_func <- function(dist_matrix, EUGER) {
   
   return(refdist_mean_df)
 }
+
+#################################################################################
+
+# Timetable (df) with weeks and years
+
+# Start: 2014 W40
+# End: 2023 W39
+# 2015 and 2020 have 53 instead of 53 weeks
+
+week <- rep(c(1:53), times = 10)
+year <- rep(c(2014:2023), each = 53)
+dates_df <- data.frame(year, week)
+
+vec <- which(dates_df$week == 53 & (dates_df$year != 2015 & dates_df$year!=2020)) #years with no 53rd week
+vec <- append(vec, which((between(dates_df$week, 1, 39) & dates_df$year == 2014)|(between(dates_df$week, 40, 53) & dates_df$year == 2023)))
+
+dates_df <- dates_df[-vec,]
+
+dates_df$date <- decimal_date(MMWRweek2Date(dates_df$year, dates_df$week))
+
+dates_df$index <- 1:nrow(dates_df)
+rownames(dates_df) <- dates_df$index
+
+# Determining window size and start/end date
+
+## SET WINDOW SIZE (weeks) ##
+sliding_window_size <- 8 
+
+sliding_window <- data.frame(matrix(ncol = 3))
+colnames(sliding_window) <- c("index","start_date","end_date")
+sliding_window <- sliding_window[-1,]
+
+for(i in 1:(nrow(dates_df)-(sliding_window_size - 1))) { 
+  sliding_window[i,"index"] <- i
+  sliding_window[i,"start_date"] <- dates_df$date[i]
+  sliding_window[i,"end_date"] <- dates_df$date[i+(sliding_window_size - 1)]
+}
+
+#################################################################################
+
+# Plots
 
 ## GER
 

@@ -1,4 +1,4 @@
-# SkyGrid
+# SkyGrid reconstruction
 # BEAST v1.10.4
 
 # DEU vs. EU 
@@ -8,10 +8,19 @@ library(ggplot2)
 
 #################################################################################
 
+# Base directory
+
+base_dir <- "~/Yale_Projects/Genetic_Diversity_RSV/"
+
+#################################################################################
+
 # Read data
 
-skygrid_rsvA_DEU_data <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/BEAST/skygrid_rsvA_GER_data.csv", header = TRUE)
-skygrid_rsvB_DEU_data <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/BEAST/skygrid_rsvB_GER_data.csv", header = TRUE)
+path_skygrid_rsvA_DEU_data <- file.path(base_dir, "BEAST_output", "skygrid", "skygrid_rsvA_GER_data.csv")
+skygrid_rsvA_DEU_data <- read.csv(path_skygrid_rsvA_DEU_data, header = TRUE)
+
+path_skygrid_rsvB_DEU_data <- file.path(base_dir, "BEAST_output", "skygrid", "skygrid_rsvB_GER_data.csv")
+skygrid_rsvB_DEU_data <- read.csv(path_skygrid_rsvB_DEU_data, header = TRUE)
 
 ## Combine data
 skygrid_rsvA_DEU_data$type <- "RSV-A"

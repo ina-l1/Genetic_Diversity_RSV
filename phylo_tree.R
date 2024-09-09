@@ -8,12 +8,27 @@ library(treeio)
 library(ggtree)
 library(lubridate)
 
-# Metadata
-RefSeq_rsvA <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/RefSeq/RefSeq_rsvA.csv")
-RefSeq_rsvB <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/RefSeq/RefSeq_rsvB.csv")
+##################################################
 
-rsvA_ref <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvA_ref_metadata_EU.csv")
-rsvB_ref <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvB_ref_metadata_EU.csv")
+# Base directory
+
+base_dir <- "~/Yale_Projects/Genetic_Diversity_RSV/"
+
+##################################################
+
+# Metadata
+
+path_RefSeq_rsvA <- file.path(base_dir, "RefSeq", "RefSeq_rsvA.csv")
+RefSeq_rsvA <- read.csv(path_RefSeq_rsvA)
+
+path_RefSeq_rsvB <- file.path(base_dir, "RefSeq", "RefSeq_rsvB.csv")
+RefSeq_rsvB <- read.csv(path_RefSeq_rsvB)
+
+path_rsvA_ref <- file.path(base_dir, "Europe", "rsvA_ref_metadata_EU.csv")
+rsvA_ref <- read.csv(path_rsvA_ref)
+
+path_rsvB_ref <- file.path(base_dir, "Europe", "rsvB_ref_metadata_EU.csv")
+rsvB_ref <- read.csv(path_rsvB_ref)
 
 rsvA_ref$Collection_Date <- as_date(rsvA_ref$Collection_Date) 
 rsvB_ref$Collection_Date <- as_date(rsvB_ref$Collection_Date) 
@@ -25,7 +40,8 @@ rsvB_ref$'EU/GER' <- ifelse(rsvB_ref$Country == "Germany", "GER", "EU") ###
 
 # Tree visualization: RSV A
 
-tree_A <- read.tree("~/Yale_Projects/Genetic_Diversity_RSV/BEAST/tree_files/tree_rsvA_EU.trees") #read.nexus for NEXUS format, read.tree for Newick format
+path_tree_A <- file.path(base_dir, "BEAST", "tree_files", "tree_rsvA_EU.trees")
+tree_A <- read.tree(path_tree_A) #read.nexus for NEXUS format, read.tree for Newick format
 
 treelabel_A <- tree_A$tip.label
 treelabel_A <- sort(treelabel_A)
@@ -62,12 +78,13 @@ treeA_plot_new <- treeA_plot %<+% df_label_A +
   )
 treeA_plot_new
 
-#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/BEAST/tree_rsvA_EU_country.pdf", width = 500, height = 1000, units = "cm", limitsize = FALSE)
+path_treeA_plot_new <- file.path(base_dir, "BEAST", "tree_rsvA_EU_country.pdf")
+#ggsave(filename = path_treeA_plot_new, width = 500, height = 1000, units = "cm", limitsize = FALSE)
 
 # Tree visualization: RSV B
 
-#tree_B <- read.tree("~/Yale_Projects/Genetic_Diversity_RSV/Europe/Treefiles/tree_rsvB_MAFFT_alignment_EU.treefile")
-tree_B <- read.tree("~/Yale_Projects/Genetic_Diversity_RSV/BEAST/tree_files/tree_rsvB_EU.trees") 
+path_tree_B <- file.path(base_dir, "BEAST", "tree_files", "tree_rsvB_EU.trees")
+tree_B <- read.tree(path_tree_B) #read.nexus for NEXUS format, read.tree for Newick format
 
 treelabel_B <- tree_B$tip.label
 treelabel_B <- sort(treelabel_B)
@@ -104,4 +121,5 @@ treeB_plot_new <- treeB_plot %<+% df_label_B +
   ) 
 treeB_plot_new
 
-#ggsave(filename = "~/Yale_Projects/Genetic_Diversity_RSV/BEAST/tree_rsvB_EU_GER.pdf", width = 500, height = 1000, units = "cm", limitsize = FALSE)
+path_treeB_plot_new <- file.path(base_dir, "BEAST", "tree_rsvB_EU_GER.pdf")
+#ggsave(filename = path_treeA_plot_new, width = 500, height = 1000, units = "cm", limitsize = FALSE)

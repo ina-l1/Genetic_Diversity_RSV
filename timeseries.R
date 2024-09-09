@@ -8,13 +8,23 @@ library(MMWRweek)
 
 #################################################################################
 
+# Base directory
+
+base_dir <- "~/Yale_Projects/Genetic_Diversity_RSV/"
+
+##################################################
+
 # Sequence count: Read metadata
 
-rsvAB <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Germany/rsvAB_metadata_GER.csv", row.names = 1)
+path_rsvAB <- file.path(base_dir, "Germany", "rsvAB_metadata_GER.csv")
+rsvAB <- read.csv(path_rsvAB, row.names = 1)
+
 rsvAB$Collection_Date <- as_date(rsvAB$Collection_Date)
 rsvAB$MMWR_start_date <- MMWRweek2Date(MMWRyear = rsvAB$MMWRyear, MMWRweek = rsvAB$MMWRweek)
 
-rsvAB_EU <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/rsvAB_metadata_EU.csv", row.names = 1)
+path_rsvAB_EU <- file.path(base_dir, "Europe", "rsvAB_metadata_EU.csv")
+rsvAB_EU <- read.csv(path_rsvAB_EU, row.names = 1)
+
 rsvAB_EU$Collection_Date <- as_date(rsvAB_EU$Collection_Date)
 rsvAB_EU$MMWR_start_date <- MMWRweek2Date(MMWRyear = rsvAB_EU$MMWRyear, MMWRweek = rsvAB_EU$MMWRweek)
 
@@ -39,7 +49,9 @@ seq_count_ESP$MMWR_start_date <- as_date(seq_count_ESP$MMWR_start_date)
 start_date <- MMWRweek2Date(2014, 40)
 end_date <- MMWRweek2Date(2023, 39) #Most recent sequence data available from 2022/2023 season
 
-case_flunet <- read.csv("~/Yale_Projects/Genetic_Diversity_RSV/Europe/VIW_FNT.csv")
+path_case_flunet <- file.path(base_dir, "Europe", "VIW_FNT.csv")
+case_flunet <- read.csv(path_case_flunet)
+
 case_flunet$ISO_WEEKSTARTDATE <- as_date(case_flunet$ISO_WEEKSTARTDATE)
 case_flunet$MMWR_WEEKSTARTDATE <- as_date(case_flunet$MMWR_WEEKSTARTDATE)
 
