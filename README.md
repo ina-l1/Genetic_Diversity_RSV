@@ -37,6 +37,8 @@ To run code offline please adjust the file paths accordingly.
 #### Required R packages
 
 - tidyr (1.3.1): Data manipulation
+- dplyr (1.1.4): Data manipulation
+- stringr (1.5.1): Simplifying string operations
 - ggplot2 (3.5.1): Plots and data visualization
 - patchwork (1.2.0): Plot manipulation
 - ggtree (3.12.0): Phylogenetic tree visualization and annotation
@@ -48,7 +50,7 @@ To run code offline please adjust the file paths accordingly.
 
 ```
 # Required packages
-libs <- c("tidyr", "ggplot2", "patchwork", "ggtree", "treeio", "lubridate", "MMWRweek", "ape", "usedist")
+libs <- c("tidyr", "dplyr", "stringr", "ggplot2", "patchwork", "ggtree", "treeio", "lubridate", "MMWRweek", "ape", "usedist")
 
 # Install and load missing packages
 sapply(libs, function(pkg) {
