@@ -49,6 +49,7 @@ To run code offline please adjust the file paths accordingly.
 - ape (5.8): Reading and analyzing genomic data
 - usedist (0.4.0): Calculate distance matrix
 
+```
 # Required packages
 libs <- c("tidyr", "dplyr", "tibble", "stringr", "ggplot2", "patchwork", "ggtree", "treeio", "lubridate", "MMWRweek", "ape", "usedist")
 
@@ -57,6 +58,7 @@ sapply(libs, function(pkg) {
     if (!pkg %in% installed.packages()[, "Package"]) install.packages(pkg)
     library(pkg, character.only = TRUE)
 })
+```
 
 ### Other software
 
