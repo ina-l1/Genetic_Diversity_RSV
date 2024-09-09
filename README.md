@@ -32,7 +32,7 @@ For further information please refer to the abstract below.
 
 All available code is written in R (v4.4.1) using Rstudio (v2024.04.2+764). 
 
-To run code offline please adjust the file paths accordingly. 
+To run code offline please adjust the root directory and file paths if necessary. 
 
 #### Required R packages
 
