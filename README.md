@@ -99,13 +99,18 @@ Examining the temporal pattern of genetic diversity within an epidemic cycle cou
 
 ### Author list
 
-Ina Li, RWTH Aachen University, Germany and Department of Epidemiology of Microbial Diseases, Yale School of Public Health, USA. <br>
-Jiye Kwon, Department of Epidemiology of Microbial Diseases, Yale School of Public Health, USA. <br>
-Verity Hill, Department of Epidemiology of Microbial Diseases, Yale School of Public Health, USA. <br>
-C. Brandon Ogbunu, Department of Ecology and Evolutionary Biology, Yale School of Medicine, USA. <br>
-Anna Matuszyńska, Computational Life Science, Department of Biology, RWTH Aachen University, Germany. <br>
-Virginia E. Pitzer, Department of Epidemiology of Microbial Diseases, Yale School of Public Health, USA. <br>
-Daniel M. Weinberger, Department of Epidemiology of Microbial Diseases, Yale School of Public Health, USA. <br>
+Ina Li ^1,4^ <br>
+Jiye Kwon ^1^ <br>
+Verity Hill ^1^ <br>
+C. Brandon Ogbunu ^2^ <br>
+Anna Matuszyńska ^3^ <br>
+Virginia E. Pitzer ^1^ <br>
+Daniel M. Weinberger ^1^ <br>
+
+^1^ Department of Epidemiology of Microbial Diseases, Yale School of Public Health, USA.<br>
+^2^ Department of Ecology and Evolutionary Biology, Yale University, USA. <br>
+^3^ Computational Life Science, Department of Biology, RWTH Aachen University, Germany. <br>
+^4^ RWTH Aachen University, Germany.
 
 ## Contact
 
