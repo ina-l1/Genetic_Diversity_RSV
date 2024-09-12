@@ -60,24 +60,25 @@ beast_label_df <- relocate(beast_label_df, tip.label)
 
 ## Plot tree
 
-ggtree(beast_tree) %<+% beast_label_df + 
-  geom_tippoint(aes(color = country), size=20) + #color = season or color = EUGER
+beast_rsvA_plot <- ggtree(beast_tree, aes(color = country), size=20) %<+% beast_label_df + 
+  geom_tippoint(aes(color = country), size=80) + #color = season or color = EUGER
   geom_tiplab(
     geom = "text",
-    size = 10
+    size = 80,
+    color = "black"
   ) +
-#  scale_color_manual(values = c("GER" = "red", "EU" =  "blue")) + #enable if EUGER
+  #scale_color_manual(values = c("GER" = "red", "EU" =  "blue")) + #enable if EUGER
   guides(color = guide_legend(title = "Country")) + #title = "Season" or "EU/GER"
   theme(
-    legend.title = element_text(size = 30),
-    legend.text = element_text(size = 30)
+    legend.title = element_text(size = 500),
+    legend.text = element_text(size = 500)
   ) +
   geom_text2(aes(label=round(as.numeric(posterior), 2), 
                  subset=as.numeric(posterior)> 0.9, 
                  x=branch), vjust=0)
 
 path_treeA_plot_new <- file.path(base_dir, "BEAST_output", "phylogenetic_tree", "tree_rsvA_EU_country.pdf")
-ggsave(filename = path_treeA_plot_new, width = 500, height = 1000, units = "cm", limitsize = FALSE)
+ggsave(filename = path_treeA_plot_new, width = 3200, height = 5000, units = "cm", limitsize = FALSE)
 
 # Tree visualization: RSV B
 
@@ -101,21 +102,22 @@ beast_label_df <- relocate(beast_label_df, tip.label)
 
 ## Plot tree
 
-ggtree(beast_tree) %<+% beast_label_df + 
-  geom_tippoint(aes(color = country), size=20) + #color = season or color = EUGER
+beast_rsvB_plot <- ggtree(beast_tree, aes(color = country), size=20) %<+% beast_label_df + 
+  geom_tippoint(aes(color = country), size=80) + #color = season or color = EUGER
   geom_tiplab(
     geom = "text",
-    size = 10
+    size = 80,
+    color = "black"
   ) +
-#  scale_color_manual(values = c("GER" = "red", "EU" =  "blue")) + #enable if EUGER
+  #scale_color_manual(values = c("GER" = "red", "EU" =  "blue")) + #enable if EUGER
   guides(color = guide_legend(title = "Country")) + #title = "Season" or "EU/GER"
   theme(
-    legend.title = element_text(size = 30),
-    legend.text = element_text(size = 30)
+    legend.title = element_text(size = 500),
+    legend.text = element_text(size = 500)
   ) +
   geom_text2(aes(label=round(as.numeric(posterior), 2), 
                  subset=as.numeric(posterior)> 0.9, 
                  x=branch), vjust=0)
 
 path_treeB_plot_new <- file.path(base_dir, "BEAST_output", "phylogenetic_tree", "tree_rsvB_EU_country.pdf")
-ggsave(filename = path_treeB_plot_new, width = 500, height = 1000, units = "cm", limitsize = FALSE)
+ggsave(filename = path_treeB_plot_new, width = 3200, height = 5000, units = "cm", limitsize = FALSE)
