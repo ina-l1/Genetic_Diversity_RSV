@@ -60,7 +60,7 @@ beast_label_df <- relocate(beast_label_df, tip.label)
 
 ## Plot tree
 
-beast_rsvA_plot <- ggtree(beast_tree, aes(color = country), size=20) %<+% beast_label_df + 
+beast_rsvA_plot <- ggtree(beast_tree, mrsd = "2022-12-07", aes(color = country), size=20) %<+% beast_label_df + 
   geom_tippoint(aes(color = country), size=80) + #color = season or color = EUGER
   geom_tiplab(
     geom = "text",
@@ -69,16 +69,17 @@ beast_rsvA_plot <- ggtree(beast_tree, aes(color = country), size=20) %<+% beast_
   ) +
   #scale_color_manual(values = c("GER" = "red", "EU" =  "blue")) + #enable if EUGER
   guides(color = guide_legend(title = "Country")) + #title = "Season" or "EU/GER"
-  theme(
-    legend.title = element_text(size = 500),
-    legend.text = element_text(size = 500)
-  ) +
-  geom_text2(aes(label=round(as.numeric(posterior), 2), 
-                 subset=as.numeric(posterior)> 0.9, 
-                 x=branch), vjust=0)
+  geom_text2(aes(label=round(as.numeric(posterior), 2), subset=as.numeric(posterior)> 0.9, x=branch), vjust=0) +
+  theme_tree2() +
+  theme(axis.text.x = element_text(size = 500, face = "bold"), 
+        axis.title.x = element_text(size = 500),
+        axis.ticks.length = unit(10, "cm"),
+        legend.title = element_text(size = 500),
+        legend.text = element_text(size = 500)) +
+  scale_x_continuous(breaks = seq(2011,2023, by = 1))
 
 path_treeA_plot_new <- file.path(base_dir, "BEAST_output", "phylogenetic_tree", "tree_rsvA_EU_country.pdf")
-ggsave(filename = path_treeA_plot_new, width = 3200, height = 5000, units = "cm", limitsize = FALSE)
+ggsave(filename = path_treeA_plot_new, width = 2000, height = 5000, units = "cm", limitsize = FALSE)
 
 # Tree visualization: RSV B
 
@@ -86,7 +87,6 @@ path_beast_tree <- file.path(base_dir, "BEAST", "tree_files", "tree_rsvB_EU.tree
 beast_tree <- read.beast(path_beast_tree)
 
 ## Create tip labels
-
 beast_tree_df <- as_tibble(beast_tree)
 beast_tree_label <- sort(beast_tree_df$label)
 beast_label_df <- data.frame(treelabel = beast_tree_label,
@@ -102,7 +102,7 @@ beast_label_df <- relocate(beast_label_df, tip.label)
 
 ## Plot tree
 
-beast_rsvB_plot <- ggtree(beast_tree, aes(color = country), size=20) %<+% beast_label_df + 
+beast_rsvB_plot <- ggtree(beast_tree, mrsd = "2022-12-07", aes(color = country), size=20) %<+% beast_label_df + 
   geom_tippoint(aes(color = country), size=80) + #color = season or color = EUGER
   geom_tiplab(
     geom = "text",
@@ -111,13 +111,14 @@ beast_rsvB_plot <- ggtree(beast_tree, aes(color = country), size=20) %<+% beast_
   ) +
   #scale_color_manual(values = c("GER" = "red", "EU" =  "blue")) + #enable if EUGER
   guides(color = guide_legend(title = "Country")) + #title = "Season" or "EU/GER"
-  theme(
-    legend.title = element_text(size = 500),
-    legend.text = element_text(size = 500)
-  ) +
-  geom_text2(aes(label=round(as.numeric(posterior), 2), 
-                 subset=as.numeric(posterior)> 0.9, 
-                 x=branch), vjust=0)
+  geom_text2(aes(label=round(as.numeric(posterior), 2), subset=as.numeric(posterior)> 0.9, x=branch), vjust=0) +
+  theme_tree2() +
+  theme(axis.text.x = element_text(size = 500, face = "bold"), 
+        axis.title.x = element_text(size = 500),
+        axis.ticks.length = unit(10, "cm"),
+        legend.title = element_text(size = 500),
+        legend.text = element_text(size = 500)) +
+  scale_x_continuous(breaks = seq(2007, 2023, by = 1))
 
 path_treeB_plot_new <- file.path(base_dir, "BEAST_output", "phylogenetic_tree", "tree_rsvB_EU_country.pdf")
-ggsave(filename = path_treeB_plot_new, width = 3200, height = 5000, units = "cm", limitsize = FALSE)
+ggsave(filename = path_treeB_plot_new, width = 3000, height = 5000, units = "cm", limitsize = FALSE)
