@@ -40,86 +40,82 @@ rsvB_ref$'EU/GER' <- ifelse(rsvB_ref$Country == "Germany", "GER", "EU") ###
 
 # Tree visualization: RSV A
 
-path_tree_A <- file.path(base_dir, "BEAST", "tree_files", "tree_rsvA_EU.trees")
-tree_A <- read.tree(path_tree_A) #read.nexus for NEXUS format, read.tree for Newick format
+path_beast_tree <- file.path(base_dir, "BEAST", "tree_files", "tree_rsvA_EU.trees")
+beast_tree <- read.beast(path_beast_tree)
 
-treelabel_A <- tree_A$tip.label
-treelabel_A <- sort(treelabel_A)
+## Create tip labels
 
-df_label_A <- data.frame(treelabel = treelabel_A,
-                       accession = rsvA_ref$Accession,
-                       type = rsvA_ref$Type,
-                       collection_date = rsvA_ref$Collection_Date,
-                       season = rsvA_ref$Collection_Season,
-                       country = rsvA_ref$Country,
-                       EUGER = rsvA_ref$`EU/GER`)
+beast_tree_df <- as_tibble(beast_tree)
+beast_tree_label <- sort(beast_tree_df$label)
+beast_label_df <- data.frame(treelabel = beast_tree_label,
+                             accession = rsvA_ref$Accession,
+                             type = rsvA_ref$Type,
+                             collection_date = rsvA_ref$Collection_Date,
+                             season = rsvA_ref$Collection_Season,
+                             country = rsvA_ref$Country,
+                             EUGER = rsvA_ref$`EU/GER`)
+beast_label_df$tip.label <- paste(beast_label_df$accession, beast_label_df$type, beast_label_df$season, beast_label_df$country, sep = "_")
+beast_tree <- rename_taxa(beast_tree, data = beast_label_df, key = 1, value = tip.label)
+beast_label_df <- relocate(beast_label_df, tip.label)
 
-df_label_A$tip.label <- paste(df_label_A$accession, df_label_A$type, df_label_A$season, df_label_A$country, sep = "_")
-#df_label_A$tip.label[which(df_label_A$accession == RefSeq_rsvA$Accession)] <- paste(RefSeq_rsvA$Accession, "A", "Ref", sep = "_") #Reference genome
+## Plot tree
 
-tree_A <- rename_taxa(tree_A, data = df_label_A, key = 1, value = tip.label) #rename tip label of tree into shorter version
-
-treeA_plot <- ggtree(tree_A)
-treeA_plot
-
-df_label_A <- relocate(df_label_A, tip.label) #move tip.label to first column for plotting
-
-treeA_plot_new <- treeA_plot %<+% df_label_A + 
-  geom_tippoint(aes(color = country), size=20) + #color = season
+ggtree(beast_tree) %<+% beast_label_df + 
+  geom_tippoint(aes(color = country), size=20) + #color = season or color = EUGER
   geom_tiplab(
     geom = "text",
     size = 10
   ) +
-#  scale_color_manual(values = c("GER" = "red", "EU" =  "blue")) +
-  guides(color = guide_legend(title = "Country")) + #title = "Season"
+#  scale_color_manual(values = c("GER" = "red", "EU" =  "blue")) + #enable if EUGER
+  guides(color = guide_legend(title = "Country")) + #title = "Season" or "EU/GER"
   theme(
     legend.title = element_text(size = 30),
     legend.text = element_text(size = 30)
-  )
-treeA_plot_new
+  ) +
+  geom_text2(aes(label=round(as.numeric(posterior), 2), 
+                 subset=as.numeric(posterior)> 0.9, 
+                 x=branch), vjust=0)
 
-path_treeA_plot_new <- file.path(base_dir, "BEAST", "tree_rsvA_EU_country.pdf")
-#ggsave(filename = path_treeA_plot_new, width = 500, height = 1000, units = "cm", limitsize = FALSE)
+path_treeA_plot_new <- file.path(base_dir, "BEAST_output", "phylogenetic_tree", "tree_rsvA_EU_country.pdf")
+ggsave(filename = path_treeA_plot_new, width = 500, height = 1000, units = "cm", limitsize = FALSE)
 
 # Tree visualization: RSV B
 
-path_tree_B <- file.path(base_dir, "BEAST", "tree_files", "tree_rsvB_EU.trees")
-tree_B <- read.tree(path_tree_B) #read.nexus for NEXUS format, read.tree for Newick format
+path_beast_tree <- file.path(base_dir, "BEAST", "tree_files", "tree_rsvB_EU.trees")
+beast_tree <- read.beast(path_beast_tree)
 
-treelabel_B <- tree_B$tip.label
-treelabel_B <- sort(treelabel_B)
+## Create tip labels
 
-df_label_B <- data.frame(treelabel = treelabel_B,
-                         accession = rsvB_ref$Accession,
-                         type = rsvB_ref$Type,
-                         collection_date = rsvB_ref$Collection_Date,
-                         season = rsvB_ref$Collection_Season,
-                         country = rsvB_ref$Country,
-                         EUGER = rsvB_ref$`EU/GER`) 
+beast_tree_df <- as_tibble(beast_tree)
+beast_tree_label <- sort(beast_tree_df$label)
+beast_label_df <- data.frame(treelabel = beast_tree_label,
+                             accession = rsvB_ref$Accession,
+                             type = rsvB_ref$Type,
+                             collection_date = rsvB_ref$Collection_Date,
+                             season = rsvB_ref$Collection_Season,
+                             country = rsvB_ref$Country,
+                             EUGER = rsvB_ref$`EU/GER`)
+beast_label_df$tip.label <- paste(beast_label_df$accession, beast_label_df$type, beast_label_df$season, beast_label_df$country, sep = "_")
+beast_tree <- rename_taxa(beast_tree, data = beast_label_df, key = 1, value = tip.label)
+beast_label_df <- relocate(beast_label_df, tip.label)
 
-df_label_B$tip.label <- paste(df_label_B$accession, df_label_B$type, df_label_B$season, df_label_B$country, sep = "_")
-#df_label_B$tip.label[which(df_label_B$accession == RefSeq_rsvB$Accession)] <- paste(RefSeq_rsvB$Accession, "B", "Ref", sep = "_") #Reference genome
+## Plot tree
 
-tree_B <- rename_taxa(tree_B, data = df_label_B, key = 1, value = tip.label)
-
-treeB_plot <- ggtree(tree_B)
-treeB_plot
-
-df_label_B <- relocate(df_label_B, tip.label)
-
-treeB_plot_new <- treeB_plot %<+% df_label_B +
-  geom_tippoint(aes(color = EUGER), size = 20) +
+ggtree(beast_tree) %<+% beast_label_df + 
+  geom_tippoint(aes(color = country), size=20) + #color = season or color = EUGER
   geom_tiplab(
     geom = "text",
     size = 10
   ) +
-  scale_color_manual(values = c("GER" = "red", "EU" =  "blue")) +
-  guides(color = guide_legend(title = "EU/GER")) +
+#  scale_color_manual(values = c("GER" = "red", "EU" =  "blue")) + #enable if EUGER
+  guides(color = guide_legend(title = "Country")) + #title = "Season" or "EU/GER"
   theme(
     legend.title = element_text(size = 30),
     legend.text = element_text(size = 30)
-  ) 
-treeB_plot_new
+  ) +
+  geom_text2(aes(label=round(as.numeric(posterior), 2), 
+                 subset=as.numeric(posterior)> 0.9, 
+                 x=branch), vjust=0)
 
-path_treeB_plot_new <- file.path(base_dir, "BEAST", "tree_rsvB_EU_GER.pdf")
-#ggsave(filename = path_treeA_plot_new, width = 500, height = 1000, units = "cm", limitsize = FALSE)
+path_treeB_plot_new <- file.path(base_dir, "BEAST_output", "phylogenetic_tree", "tree_rsvB_EU_country.pdf")
+ggsave(filename = path_treeB_plot_new, width = 500, height = 1000, units = "cm", limitsize = FALSE)
