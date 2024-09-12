@@ -69,14 +69,14 @@ beast_rsvA_plot <- ggtree(beast_tree, mrsd = "2022-12-07", aes(color = country),
   ) +
   #scale_color_manual(values = c("GER" = "red", "EU" =  "blue")) + #enable if EUGER
   guides(color = guide_legend(title = "Country")) + #title = "Season" or "EU/GER"
-  geom_text2(aes(label=round(as.numeric(posterior), 2), subset=as.numeric(posterior)> 0.9, x=branch), vjust=0) +
   theme_tree2() +
   theme(axis.text.x = element_text(size = 500, face = "bold"), 
         axis.title.x = element_text(size = 500),
         axis.ticks.length = unit(10, "cm"),
         legend.title = element_text(size = 500),
         legend.text = element_text(size = 500)) +
-  scale_x_continuous(breaks = seq(2011,2023, by = 1))
+  scale_x_continuous(breaks = seq(2011,2023, by = 1)) +
+  geom_text2(aes(label=round(as.numeric(posterior), 2), subset=as.numeric(posterior)> 0.9, x=branch), vjust=0, size = 100, color = "black")
 
 path_treeA_plot_new <- file.path(base_dir, "BEAST_output", "phylogenetic_tree", "tree_rsvA_EU_country.pdf")
 ggsave(filename = path_treeA_plot_new, width = 2000, height = 5000, units = "cm", limitsize = FALSE)
@@ -111,7 +111,7 @@ beast_rsvB_plot <- ggtree(beast_tree, mrsd = "2022-12-07", aes(color = country),
   ) +
   #scale_color_manual(values = c("GER" = "red", "EU" =  "blue")) + #enable if EUGER
   guides(color = guide_legend(title = "Country")) + #title = "Season" or "EU/GER"
-  geom_text2(aes(label=round(as.numeric(posterior), 2), subset=as.numeric(posterior)> 0.9, x=branch), vjust=0) +
+  geom_text2(aes(label=round(as.numeric(posterior), 2), subset=as.numeric(posterior)> 0.9, x=branch), vjust=0, size = 100, color = "black") +
   theme_tree2() +
   theme(axis.text.x = element_text(size = 500, face = "bold"), 
         axis.title.x = element_text(size = 500),
