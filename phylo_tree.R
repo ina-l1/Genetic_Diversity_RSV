@@ -38,6 +38,14 @@ rsvB_ref <- subset(rsvB_ref, Accession != "NC_001781.1") ###
 rsvA_ref$'EU/GER' <- ifelse(rsvA_ref$Country == "Germany", "GER", "EU") ###
 rsvB_ref$'EU/GER' <- ifelse(rsvB_ref$Country == "Germany", "GER", "EU") ###
 
+# Reference lines for each season
+
+season_start_df <- data.frame("year" = 2000:2023, "week" = 40, "season_start" = NA)
+season_start_df$season_start <- MMWRweek2Date(season_start_df$year, season_start_df$week)
+season_start_df$season_start_dec <- decimal_date(season_start_df$season_start)
+
+##################################################
+
 # Tree visualization: RSV A
 
 path_beast_tree <- file.path(base_dir, "BEAST", "tree_files", "tree_rsvA_EU.trees")
@@ -67,6 +75,7 @@ beast_rsvA_plot <- ggtree(beast_tree, mrsd = "2022-12-07", aes(color = country),
     size = 5,
     color = "black"
   ) +
+  geom_vline(xintercept = season_start_df$season_start_dec[12:24], color = "gray", linetype = "dashed") +
   #scale_color_manual(values = c("GER" = "red", "EU" =  "blue")) + #enable if EUGER
   guides(color = guide_legend(title = "Country")) + #title = "Season" or "EU/GER"
   theme_tree2() +
@@ -111,6 +120,7 @@ beast_rsvB_plot <- ggtree(beast_tree, mrsd = "2022-12-07", aes(color = country),
     size = 4,
     color = "black"
   ) +
+  geom_vline(xintercept = season_start_df$season_start_dec[7:24], color = "gray", linetype = "dashed") +
   #scale_color_manual(values = c("GER" = "red", "EU" =  "blue")) + #enable if EUGER
   guides(color = guide_legend(title = "Country")) + #title = "Season" or "EU/GER"
   theme_tree2() +
@@ -119,7 +129,7 @@ beast_rsvB_plot <- ggtree(beast_tree, mrsd = "2022-12-07", aes(color = country),
         axis.ticks.length = unit(0.1, "cm"),
         legend.title = element_text(size = 16),
         legend.text = element_text(size = 16)) +
-  scale_x_continuous(breaks = seq(2011,2023, by = 1)) +
+  scale_x_continuous(breaks = seq(2006,2023, by = 1)) +
   geom_text2(aes(label=round(as.numeric(posterior), 2), subset=as.numeric(posterior)>0.5, x=branch), vjust=-1, size = 4, color = "black")
 
 path_treeB_plot_new <- file.path(base_dir, "BEAST_output", "phylogenetic_tree", "tree_rsvB_EU_country.pdf")
