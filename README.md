@@ -30,28 +30,29 @@ For further information please refer to the abstract below.
 
 ### Installation 
 
-All available code is written in R (v4.4.1) using Rstudio (v2024.04.2+764). 
+All available code is written in R (v4.4.1 or higher) using Rstudio (v2024.04.2+764 or higher). 
 
 To run code offline please adjust the root directory and file paths if necessary. 
 
 #### Required R packages
 
-- tidyr (1.3.1): Data manipulation
-- dplyr (1.1.4): Data manipulation
-- tibble (3.2.1): Data frame manipulation
-- stringr (1.5.1): Simplifying string operations
-- ggplot2 (3.5.1): Plots and data visualization
-- patchwork (1.2.0): Plot manipulation
-- ggtree (3.12.0): Phylogenetic tree visualization and annotation
-- treeio (1.28.0): Read phylogenetic trees
-- lubridate (1.9.3): Handling dates 
-- MMWRweek (0.1.3): Converting dates to MMWR format
-- ape (5.8): Reading and analyzing genomic data
-- usedist (0.4.0): Calculate distance matrix
+- tidyr (1.3.1+): Data manipulation
+- dplyr (1.1.4+): Data manipulation
+- tibble (3.2.1+): Data frame manipulation
+- stringr (1.5.1+): Simplifying string operations
+- ggplot2 (3.5.1+): Plots and data visualization
+- patchwork (1.2.0+): Plot manipulation
+- ggtree (3.12.0+): Phylogenetic tree visualization and annotation
+- treeio (1.28.0+): Read phylogenetic trees
+- lubridate (1.9.3+): Handling dates 
+- MMWRweek (0.1.3+): Converting dates to MMWR format
+- ape (5.8+): Reading and analyzing genomic data
+- usedist (0.4.0+): Calculate distance matrix
+- here (1.0.1+): Dynamic directory
 
 ```
 # Required packages
-libs <- c("tidyr", "dplyr", "tibble", "stringr", "ggplot2", "patchwork", "ggtree", "treeio", "lubridate", "MMWRweek", "ape", "usedist")
+libs <- c("tidyr", "dplyr", "tibble", "stringr", "ggplot2", "patchwork", "ggtree", "treeio", "lubridate", "MMWRweek", "ape", "usedist", "here")
 
 # Install and load missing packages
 sapply(libs, function(pkg) {
