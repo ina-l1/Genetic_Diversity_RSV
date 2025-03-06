@@ -9,12 +9,13 @@ library(MMWRweek)
 library(lubridate)
 library(patchwork)
 library(scales)
+library(here)
 
 #################################################################################
 
 # Base directory
 
-base_dir <- "~/Yale_Projects/Genetic_Diversity_RSV/"
+base_dir <- here()
 
 #################################################################################
 

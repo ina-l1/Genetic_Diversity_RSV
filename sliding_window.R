@@ -10,13 +10,14 @@ library(tibble)
 library(lubridate)
 library(MMWRweek)
 library(ggplot2)
-library(patchwork) #combines plots in one figure
+library(patchwork)
+library(here)
 
 #################################################################################
 
 # Base directory
 
-base_dir <- "~/Yale_Projects/Genetic_Diversity_RSV/"
+base_dir <- here()
 
 #################################################################################
 

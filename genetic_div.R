@@ -7,12 +7,13 @@ library(dplyr)
 library(ape)
 library(ggplot2)
 library(usedist) #dist_groups()
+library(here)
 
 ##################################################
 
 # Base directory
 
-base_dir <- "~/Yale_Projects/Genetic_Diversity_RSV/"
+base_dir <- here()
 
 ##################################################
 

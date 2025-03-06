@@ -5,12 +5,13 @@ library(tidyr)
 library(dplyr)
 library(MMWRweek)
 library(lubridate)
+library(here)
 
 ##################################################
 
 # Base directory
 
-base_dir <- "~/Yale_Projects/Genetic_Diversity_RSV/"
+base_dir <- here()
 
 ##################################################
 

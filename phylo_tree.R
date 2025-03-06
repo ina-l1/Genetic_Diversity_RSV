@@ -7,12 +7,14 @@ library(ape)
 library(treeio)
 library(ggtree)
 library(lubridate)
+library(patchwork)
+library(here)
 
 ##################################################
 
 # Base directory
 
-base_dir <- "~/Yale_Projects/Genetic_Diversity_RSV/"
+base_dir <- here()
 
 ##################################################
 
@@ -88,7 +90,7 @@ beast_rsvA_plot <- ggtree(beast_tree, mrsd = "2022-12-07", aes(color = country),
   geom_text2(aes(label=round(as.numeric(posterior), 2), subset=as.numeric(posterior)>0.5, x=branch), vjust=-1, size = 4, color = "black")
 
 path_treeA_plot_new <- file.path(base_dir, "BEAST_output", "phylogenetic_tree", "tree_rsvA_EU_country.pdf")
-ggsave(filename = path_treeA_plot_new, width = 100, height = 320, units = "cm", limitsize = FALSE)
+#ggsave(filename = path_treeA_plot_new, width = 100, height = 320, units = "cm", limitsize = FALSE)
 
 ##################################################
 
@@ -133,4 +135,4 @@ beast_rsvB_plot <- ggtree(beast_tree, mrsd = "2022-12-07", aes(color = country),
   geom_text2(aes(label=round(as.numeric(posterior), 2), subset=as.numeric(posterior)>0.5, x=branch), vjust=-1, size = 4, color = "black")
 
 path_treeB_plot_new <- file.path(base_dir, "BEAST_output", "phylogenetic_tree", "tree_rsvB_EU_country.pdf")
-ggsave(filename = path_treeB_plot_new, width = 200, height = 300, units = "cm", limitsize = FALSE)
+#ggsave(filename = path_treeB_plot_new, width = 200, height = 300, units = "cm", limitsize = FALSE)
