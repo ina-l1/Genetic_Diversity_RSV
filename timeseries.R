@@ -21,6 +21,7 @@ rsvAB <- read.csv(path_rsvAB, row.names = 1)
 
 rsvAB$Collection_Date <- as_date(rsvAB$Collection_Date)
 rsvAB$MMWR_start_date <- MMWRweek2Date(MMWRyear = rsvAB$MMWRyear, MMWRweek = rsvAB$MMWRweek)
+rsvAB$MMWR_month_year <- as_date(paste(rsvAB$Collection_Year, rsvAB$Collection_Month, 1, sep = "-"))
 
 path_rsvAB_EU <- file.path(base_dir, "Europe", "rsvAB_metadata_EU.csv")
 rsvAB_EU <- read.csv(path_rsvAB_EU, row.names = 1)
@@ -101,14 +102,40 @@ timeseries_stack_plot <- ggplot() +
   theme_minimal()
 timeseries_stack_plot
 
-#EU + GER
-ggplot() +
-  geom_bar(data = rsvAB_EU, aes(x = MMWR_start_date)) +
-  geom_bar(data = rsvAB, aes(x = MMWR_start_date, fill = Type)) +
+ggplot(rsvAB, aes(x = Collection_Date, color = Type, fill = Type)) +
+  geom_histogram(binwidth = 7)+
+  scale_x_date(
+    date_breaks = "1 year", 
+    date_minor_breaks = "1 month", 
+    date_labels = "%Y"
+  ) +
+  scale_y_continuous() +
+  scale_color_manual(values = c("red", "blue")) +
   scale_fill_manual(values = c("red", "blue")) +
-  xlab(label = "collection year") +
-  ylab(label = "sequence count") +
   theme_minimal()
+
+#EU + GER
+custom_date_labels <- function(dates) {
+  ifelse(is.na(dates), NA, ifelse(format(dates, "%m") == "01", format(dates, "%b %Y"), format(dates, "%b")))
+}
+
+ggplot() +
+#  geom_bar(data = rsvAB_EU, aes(x = MMWR_start_date)) +
+  geom_bar(data = rsvAB, aes(x = MMWR_month_year, fill = Type)) +
+  scale_fill_manual(values = c("red", "blue"), name = "RSV subtype") +
+  scale_y_continuous(n.breaks = 10) +
+  scale_x_date(
+    date_breaks = "3 months",
+    labels = function(x) custom_date_labels(x), # Apply robust custom labels
+    guide = guide_axis(angle = -90),
+    limits = c(as_date("2014-9-01"), max(rsvAB$MMWR_month_year))
+  ) +
+  xlab(label = "collection date") +
+  ylab(label = "sequence count") +
+  theme_minimal() +
+  theme(legend.position = "top",
+        text = element_text(size = 30),
+        axis.title.x = element_text(margin = margin(t = 10)))
 
 #################################################################################
 
